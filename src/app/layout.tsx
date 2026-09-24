@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | TechSpace Computers",
-    default: "TechSpace Computers — High Performance Systems & Workstations",
+    template: "%s | FieldShift",
+    default: "FieldShift — Farms Today. A Safer Tomorrow.",
   },
   description:
-    "Leading computer store specializing in custom high-performance desktops, AI workstations, gaming laptops, and certified electronics.",
+    "FieldShift turns NASA Earth observation data into simple, practical climate insights so farmers can adapt, plan, and grow with confidence.",
   keywords: [
-    "computer shop near me",
-    "gaming pc",
-    "custom workstation",
-    "tech hardware",
-    "electronics store",
+    "climate smart farming",
+    "NASA earth data",
+    "crop planning",
+    "farm climate analysis",
+    "agriculture insights",
   ],
 };
 
@@ -23,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full scroll-smooth">
+    <html lang="en" className="h-full scroll-smooth" data-scroll-behavior="smooth">
       <body className="min-h-full bg-white text-slate-900 antialiased">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

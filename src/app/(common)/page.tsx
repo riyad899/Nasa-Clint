@@ -1,274 +1,270 @@
 import React from "react";
 import Link from "next/link";
-import { 
-  Laptop, 
-  Cpu, 
-  Zap, 
-  ShieldCheck, 
-  Sparkles, 
-  ArrowRight, 
-  Layers, 
-  Award, 
-  Server, 
-  CheckCircle2,
-  ChevronRight,
-  Gauge
+import {
+  Leaf,
+  ArrowRight,
+  Sparkles,
+  BarChart3,
+  Droplet,
+  Users,
+  Globe2,
 } from "lucide-react";
 
-const products = [
+const stages = [
   {
-    id: 1,
-    name: "Apex Cyber Titan X9",
-    category: "Extreme Gaming Rig",
-    specs: "Core i9-14900KS • RTX 4090 24GB • 64GB DDR5 • 4TB NVMe",
-    price: "$3,499.00",
-    badge: "Bestseller",
-    gradient: "from-blue-600 to-indigo-600",
+    label: "Healthier Crops",
+    active: true,
   },
   {
-    id: 2,
-    name: "Precision AI Studio Max",
-    category: "Deep Learning Workstation",
-    specs: "Dual RTX 6000 Ada • Threadripper PRO 96-Core • 256GB ECC RAM",
-    price: "$8,999.00",
-    badge: "Enterprise",
-    gradient: "from-purple-600 to-indigo-600",
+    label: "Stronger Communities",
+    active: false,
   },
   {
-    id: 3,
-    name: "Valkyrie Stealth Blade 16",
-    category: "Pro Gaming Laptop",
-    specs: "16\" OLED 240Hz • RTX 4080 • Ryzen 9 7945HX • 32GB RAM",
-    price: "$2,299.00",
-    badge: "New Release",
-    gradient: "from-emerald-600 to-teal-600",
+    label: "A Resilient Tomorrow",
+    active: false,
+  },
+];
+
+const features = [
+  {
+    icon: Leaf,
+    text: "Data-driven farming advice",
   },
   {
-    id: 4,
-    name: "Quantum Liquid Custom Loop",
-    category: "Custom Hardline Watercooled",
-    specs: "Custom Monoblock • Dual 480mm Radiators • RTX 4090 OC",
-    price: "$4,799.00",
-    badge: "Custom Lab",
-    gradient: "from-cyan-600 to-blue-600",
+    icon: Droplet,
+    text: "Climate-resilient decisions",
+  },
+  {
+    icon: Users,
+    text: "Support for healthier communities",
+  },
+  {
+    icon: Globe2,
+    text: "Real impact from space to soil",
   },
 ];
 
 export default function HomePage() {
   return (
-    <div className="space-y-16 pb-20">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-transparent"></div>
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1.5 text-xs font-semibold text-blue-400">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Next-Gen Intel Core & RTX 40 Series In Stock</span>
-              </div>
+    <main className="h-screen overflow-hidden bg-[#fbfaf7]">
 
-              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                Engineered for <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Extreme</span> Performance
-              </h1>
+      {/* ================================================= */}
+      {/*                    HERO CONTENT                   */}
+      {/* ================================================= */}
 
-              <p className="max-w-2xl text-base text-slate-300 sm:text-lg">
-                Discover bespoke custom rigs, enterprise AI workstations, and high-frequency trading terminals built with hand-binned silicon and stress-tested for 72 hours straight.
-              </p>
+      <section className="mx-auto h-[58%] max-w-7xl px-5 pt-7 sm:px-8 lg:pt-8">
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 hover:bg-blue-500 transition-all"
-                >
-                  <Gauge className="h-4 w-4" />
-                  Explore Admin Dashboard
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+        <div className="grid h-full grid-cols-1 lg:grid-cols-[1fr_240px] lg:gap-8">
 
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-slate-700 transition-all"
-                >
-                  Create Member Account
-                </Link>
-              </div>
+          {/* ================= MAIN CONTENT ================= */}
 
-              <div className="grid grid-cols-3 gap-6 pt-6 border-t border-slate-800 text-left">
-                <div>
-                  <div className="text-2xl font-bold text-white">99.9%</div>
-                  <div className="text-xs text-slate-400">Benchmark Stability</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">3 Years</div>
-                  <div className="text-xs text-slate-400">Comprehensive Care</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">Same Day</div>
-                  <div className="text-xs text-slate-400">Ready Systems Dispatch</div>
-                </div>
-              </div>
+          <div className="flex flex-col items-center text-center">
+
+            {/* NASA Label */}
+
+            <p className="text-[10px] font-medium tracking-[0.2em] text-slate-400 sm:text-xs">
+              POWERED BY NASA EARTH DATA
+            </p>
+
+            {/* Heading */}
+
+            <h1 className="mt-2 text-4xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+              Better Information
+              <br />
+              <span className="text-[#147a55]">
+                Brighter Harvests
+              </span>
+            </h1>
+
+            {/* Description */}
+
+            <p className="mt-3 max-w-xl text-xs leading-relaxed text-slate-500 sm:text-sm">
+              FieldShift turns satellite data into simple, practical insights
+              so farmers can adapt, plan, and grow with confidence.
+            </p>
+
+            {/* ================= SEARCH ================= */}
+
+            <form className="mt-5 flex w-full max-w-xl items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm">
+
+              <Leaf className="h-4 w-4 flex-shrink-0 text-[#147a55]" />
+
+              <input
+                type="text"
+                placeholder="What would you like to do today?"
+                className="w-full bg-transparent text-xs text-slate-700 placeholder-slate-400 outline-none sm:text-sm"
+              />
+
+              <button
+                type="submit"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e5f1eb] text-[#147a55] transition hover:bg-[#d4e9df]"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+            </form>
+
+            {/* ================= BUTTONS ================= */}
+
+            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row">
+
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-full bg-[#147a55] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0f6345] sm:text-sm"
+              >
+                <Sparkles className="h-4 w-4" />
+                Start Phase 1 Analysis
+              </Link>
+
+              <Link
+                href="/dashboard/climate-analysis"
+                className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 sm:text-sm"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Start Phase 2 Analysis
+              </Link>
+
             </div>
 
-            {/* Hero Visual Card */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-2xl border border-slate-700/60 bg-gradient-to-b from-slate-800/80 to-slate-900/80 p-6 shadow-2xl backdrop-blur">
-                <div className="flex items-center justify-between border-b border-slate-700/50 pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-rose-500"></span>
-                    <span className="h-3 w-3 rounded-full bg-amber-500"></span>
-                    <span className="h-3 w-3 rounded-full bg-emerald-500"></span>
-                  </div>
-                  <span className="text-xs font-mono text-slate-400">spec_status: PASS</span>
-                </div>
+            {/* Button Description */}
 
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center justify-between rounded-xl bg-slate-950/60 p-4 border border-slate-800">
-                    <div className="flex items-center gap-3">
-                      <Cpu className="h-5 w-5 text-blue-400" />
-                      <div>
-                        <div className="text-xs font-semibold text-slate-200">CPU Benchmark</div>
-                        <div className="text-[11px] text-slate-400">i9-14900KS @ 6.2 GHz</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-mono font-bold text-emerald-400">100% Score</span>
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-xl bg-slate-950/60 p-4 border border-slate-800">
-                    <div className="flex items-center gap-3">
-                      <Zap className="h-5 w-5 text-amber-400" />
-                      <div>
-                        <div className="text-xs font-semibold text-slate-200">Thermals & Acoustics</div>
-                        <div className="text-[11px] text-slate-400">Full Load Under 62°C</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-mono font-bold text-emerald-400">Ultra-Quiet</span>
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-xl bg-slate-950/60 p-4 border border-slate-800">
-                    <div className="flex items-center gap-3">
-                      <ShieldCheck className="h-5 w-5 text-purple-400" />
-                      <div>
-                        <div className="text-xs font-semibold text-slate-200">QA Stress Certification</div>
-                        <div className="text-[11px] text-slate-400">72-Hour Burn-in test</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-mono font-bold text-blue-400">Certified</span>
-                  </div>
-                </div>
-
-                <div className="mt-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-center">
-                  <div className="text-xs font-medium uppercase tracking-wider text-blue-100">Layout Demo</div>
-                  <div className="text-sm font-semibold text-white">This page is inside the Common Layout</div>
-                </div>
-              </div>
+            <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-slate-400 sm:flex-row sm:gap-8">
+              <span>Quick insights for today</span>
+              <span>Advanced insights for long-term planning</span>
             </div>
+
+
+            {/* ================= FEATURES ================= */}
+
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-100 pt-4 text-[11px] text-slate-600 sm:gap-x-8 sm:text-xs">
+
+              {features.map((feature) => {
+                const Icon = feature.icon;
+
+                return (
+                  <div
+                    key={feature.text}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Icon className="h-3.5 w-3.5 text-[#147a55]" />
+                    <span>{feature.text}</span>
+                  </div>
+                );
+              })}
+
+            </div>
+
           </div>
+
+
+          {/* ================================================= */}
+          {/*              RIGHT STAGES                         */}
+          {/* ================================================= */}
+
+          <div className="hidden items-center lg:flex">
+
+            <div className="relative w-full pl-4">
+
+              {/* Vertical Line */}
+
+              <div className="absolute left-[19px] top-2 h-[calc(100%-16px)] w-px bg-slate-200" />
+
+              <div className="space-y-6">
+
+                {stages.map((stage) => (
+                  <div
+                    key={stage.label}
+                    className="relative flex items-center gap-4"
+                  >
+
+                    <span
+                      className={`relative z-10 h-3 w-3 flex-shrink-0 rounded-full border-2 ${
+                        stage.active
+                          ? "border-[#147a55] bg-[#147a55]"
+                          : "border-slate-300 bg-[#fbfaf7]"
+                      }`}
+                    />
+
+                    <span
+                      className={`text-xs ${
+                        stage.active
+                          ? "font-semibold text-[#173d2a]"
+                          : "text-slate-400"
+                      }`}
+                    >
+                      {stage.label}
+                    </span>
+
+                  </div>
+                ))}
+
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
+
       </section>
 
-      {/* Featured Rigs Section */}
-      <section id="featured" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-600">Featured Builds</div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              Flagship Series Systems
-            </h2>
-          </div>
-          <Link
-            href="/signin"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
-          >
-            Sign in to configure custom build <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
-            >
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
-                    {item.badge}
-                  </span>
-                  <div className={`h-2.5 w-2.5 rounded-full bg-gradient-to-r ${item.gradient}`}></div>
-                </div>
+      {/* ================================================= */}
+      {/*              FULL WIDTH IMAGE                     */}
+      {/* ================================================= */}
 
-                <h3 className="mt-4 font-bold text-slate-900 text-lg leading-snug">
-                  {item.name}
-                </h3>
-                <p className="mt-1 text-xs font-medium text-slate-500">{item.category}</p>
+      <section className="relative h-[42%] min-h-[280px] w-full overflow-hidden">
 
-                <p className="mt-3 text-xs leading-relaxed text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                  {item.specs}
-                </p>
-              </div>
+        {/* Image */}
 
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <div>
-                  <span className="block text-[10px] text-slate-400">Starting from</span>
-                  <span className="text-lg font-bold text-slate-900">{item.price}</span>
-                </div>
-                <Link
-                  href="/dashboard"
-                  className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-600 transition-colors"
-                >
-                  Inspect
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+        <div
+          className="absolute inset-0 bg-cover bg-[center_15%] bg-no-repeat"
+          style={{
+            backgroundImage:
+              "url('https://i.ibb.co.com/spZxWQ7q/Chat-GPT-Image-Sep-24-2026-06-05-14-PM.png')",
+          }}
+        />
 
-      {/* Navigation Matrix Banner */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900">Experience All 3 Layouts</h3>
-          <p className="mt-1 text-sm text-slate-500">
-            Click any button below to see the dedicated layout in action:
+        {/* Top Fade */}
+
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#fbfaf7] via-[#fbfaf7]/40 to-transparent" />
+
+        {/* Bottom Overlay */}
+
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#173d2a]/70 to-transparent" />
+
+
+        {/* ================= IMAGE TEXT ================= */}
+
+        <div className="absolute left-6 top-6 sm:left-10 sm:top-8 lg:left-14">
+
+          <p className="font-serif text-sm italic leading-5 text-white drop-shadow-md sm:text-base">
+            From Space Data
+            <br />
+            to Stronger Farms
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Link
-              href="/"
-              className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-blue-900 hover:bg-blue-50 transition"
-            >
-              <div>
-                <p className="font-semibold text-sm">1. Common Layout</p>
-                <p className="text-xs text-blue-600 mt-0.5">Navbar + Schema + Footer (Current)</p>
-              </div>
-              <CheckCircle2 className="h-5 w-5 text-blue-600" />
-            </Link>
+          <div className="mt-1.5 h-px w-20 bg-white/70" />
 
-            <Link
-              href="/signin"
-              className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-900 hover:bg-slate-100 transition"
-            >
-              <div>
-                <p className="font-semibold text-sm">2. Auth Layout</p>
-                <p className="text-xs text-slate-500 mt-0.5">No Navbar, No Footer (Full Focus)</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
-            </Link>
-
-            <Link
-              href="/dashboard"
-              className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-900 hover:bg-slate-100 transition"
-            >
-              <div>
-                <p className="font-semibold text-sm">3. Dashboard Layout</p>
-                <p className="text-xs text-slate-500 mt-0.5">Static Sidebar + Top Bar Console</p>
-              </div>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
-            </Link>
-          </div>
         </div>
+
+
+        {/* ================= NASA BADGE ================= */}
+
+        <div className="absolute bottom-4 right-5 flex items-center gap-2 rounded-full bg-[#0f2e20]/80 px-3 py-1.5 text-[10px] text-white backdrop-blur-md sm:bottom-5 sm:right-10 sm:text-xs">
+
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[8px] font-bold text-[#0f2e20]">
+            N
+          </span>
+
+          <span>
+            Powered by NASA Earth Data
+          </span>
+
+        </div>
+
       </section>
-    </div>
+
+    </main>
   );
 }
