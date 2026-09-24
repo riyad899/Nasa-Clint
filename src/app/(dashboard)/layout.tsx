@@ -3,48 +3,33 @@
 import DashboardNavbar from "@/Components/modules/Dashboord/DashboardNavbar";
 import DashboardSidebar from "@/Components/modules/Dashboord/DashboardSidebar";
 import React, { useState } from "react";
+import { DashboardHeaderProvider, useDashboardHeader } from "./header-context";
 
-const RootDashboardLayout = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+function Shell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { header } = useDashboardHeader();
 
   return (
-    <div
-      className="flex h-screen overflow-hidden"
-      style={{ background: "#F5F5F5" }}
-    >
-      {/* Sidebar */}
-      <DashboardSidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
+    <div className="flex h-screen overflow-hidden bg-[#f5f7f5]">
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Right column */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Navbar */}
-        <DashboardNavbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
+        <DashboardNavbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)}>
+          {header}
+        </DashboardNavbar>
 
-        {/* Page content */}
-        <main
-          className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6"
-          style={{ background: "#F5F5F5" }}
-        >
-          <div
-            className="min-h-full rounded-xl p-3 sm:p-4 md:p-6"
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #ebeaea",
-            }}
-          >
-            {children}
-          </div>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {children}
         </main>
       </div>
     </div>
   );
-};
+}
 
-export default RootDashboardLayout;
+export default function RootDashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <DashboardHeaderProvider>
+      <Shell>{children}</Shell>
+    </DashboardHeaderProvider>
+  );
+}
