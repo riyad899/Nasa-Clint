@@ -7,18 +7,23 @@ import { DashboardHeaderProvider, useDashboardHeader } from "./header-context";
 
 function Shell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { header } = useDashboardHeader();
+  const { header, transparentNav } = useDashboardHeader();
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f7f5]">
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardNavbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)}>
+      <div className="relative flex flex-1 flex-col overflow-hidden">
+        <DashboardNavbar
+          onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+          transparent={transparentNav}
+        >
           {header}
         </DashboardNavbar>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {/* When transparent, navbar is `absolute` so it doesn't consume space —
+            main fills from y=0 and the hero handles its own top padding. */}
+        <main className="flex-1 overflow-y-auto p-0">
           {children}
         </main>
       </div>

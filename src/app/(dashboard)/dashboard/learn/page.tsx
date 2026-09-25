@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Caveat } from "next/font/google";
 import { Satellite, CloudRain, Sprout, Leaf, RotateCw, Droplet, CloudLightning, Play, ChevronRight, ArrowRight } from "lucide-react";
+import { TransparentNavSlot } from "../../header-context";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 
 // Handwritten font — same one used across the app for consistency
@@ -79,13 +80,13 @@ export default function LearnPage() {
   const [activeTopic, setActiveTopic] = useState("All Topics");
 
   return (
-    <div className="space-y-6">
-      {/* ================= HERO =================
-          Light background with a photo bleeding off the right edge, fading
-          into the page background — same treatment as the other dashboard
-          pages, not a full dark-overlay banner. */}
-      <section className="relative min-h-[190px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
-        <div className="absolute inset-y-0 right-0 w-[58%] sm:w-1/2">
+    <div className="pb-8">
+      <TransparentNavSlot />
+
+      {/* ================= HERO ================= */}
+      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
           <div
             className="absolute inset-0 bg-cover bg-[center_60%]"
             style={{
@@ -93,30 +94,42 @@ export default function LearnPage() {
                 "url('https://i.ibb.co.com/tp4x9fn8/Chat-GPT-Image-Sep-24-2026-11-33-05-PM.png')",
             }}
           />
-          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
+          {/* Minimal left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
+          {/* Top fade for readable navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
+          {/* Smoky bottom blend into #f5f7f5 */}
+          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
         </div>
 
-        <div className="relative max-w-lg">
-          <h1 className="text-3xl font-semibold text-slate-900">Learn</h1>
+        {/* Text content */}
+        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+          <div className="max-w-lg">
+            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">Learn</h1>
 
-          <p className="mt-1 text-sm text-slate-600">
-            Simple guides for smarter, climate-resilient farming.
-          </p>
+            <p className="mt-1 text-base font-medium text-slate-700">
+              Simple guides for smarter, climate-resilient farming.
+            </p>
 
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-500">
-            Explore topics on climate, crops, soil, and NASA data — explained
-            in simple language, with real examples.
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600">
+              Explore topics on climate, crops, soil, and NASA data — explained
+              in simple language, with real examples.
+            </p>
+          </div>
+
+          <p
+            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+          >
+            Knowledge Today
+            <br />
+            Healthier Fields Tomorrow.
           </p>
         </div>
-
-        <p
-          className={`${script.className} absolute right-6 top-7 hidden -rotate-2 text-2xl leading-6 text-[#173d2a] sm:right-10 sm:block`}
-        >
-          Knowledge Today
-          <br />
-          Healthier Fields Tomorrow.
-        </p>
       </section>
+
+      {/* Content wrapper */}
+      <div className="relative -mt-6 z-10 space-y-6 px-4 sm:px-6">
 
       <div className="flex flex-wrap gap-2">
         {topics.map((t) => (
@@ -216,6 +229,7 @@ export default function LearnPage() {
       </section>
 
       <AskAiBar title="Ask FieldShift AI" subtitle="Get simple explanations, farming tips, or learn more about any topic in Bangla or English." placeholder="e.g. What is NDVI?" />
+      </div>
     </div>
   );
 }

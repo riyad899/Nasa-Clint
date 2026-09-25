@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Quote,
 } from "lucide-react";
-import { DashboardHeaderSlot } from "../../header-context";
+import { TransparentNavSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 
@@ -47,10 +47,57 @@ export default function RecommendationsPage() {
   const [priority, setPriority] = useState("Save Water");
 
   return (
-    <div className="space-y-6">
-      <DashboardHeaderSlot>
+    <div className="pb-8">
+      <TransparentNavSlot />
+
+      {/* ================= HERO ================= */}
+      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url("https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png")`,
+            }}
+          />
+          {/* Minimal left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
+          {/* Top fade for readable navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
+          {/* Smoky bottom blend into #f5f7f5 */}
+          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
+        </div>
+
+        {/* Text content */}
+        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+          <div className="max-w-md">
+            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Recommendations
+            </h1>
+            <p className="mt-1 text-lg font-semibold text-[#173d2a]">
+              {location} · {crop}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Actionable farming recommendations based on NASA Earth observations
+              and AI analysis.
+            </p>
+          </div>
+
+          <p
+            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+          >
+            Better Choices
+            <br />
+            Greener Tomorrows.
+          </p>
+        </div>
+      </section>
+
+      {/* Floating FilterBar card */}
+      <div className="relative -mt-12 z-10 mb-8 px-4 sm:px-6">
         <FilterBar
-          variant="bar"
+          variant="card"
           location={location}
           crop={crop}
           priority={priority}
@@ -60,37 +107,10 @@ export default function RecommendationsPage() {
           onSubmit={() => {}}
           hasResult
         />
-      </DashboardHeaderSlot>
+      </div>
 
-      {/* ================= HERO ================= */}
-      <section
-        className="relative min-h-[300px] overflow-hidden rounded-2xl bg-cover bg-center"
-        style={{
-          backgroundImage: `url("https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png")`,
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#fdf3e0] via-[#f3e0bd]/75 to-transparent" />
-
-        <div className="relative z-10 flex min-h-[300px] flex-col justify-center px-6 py-8 sm:px-10">
-          <h1 className="text-3xl font-semibold text-slate-900">
-            Recommendations
-          </h1>
-
-          <p className="mt-2 max-w-md text-sm leading-6 text-slate-700">
-            Actionable farming recommendations based on NASA Earth observations
-            and AI analysis.
-          </p>
-        </div>
-
-        <p
-          className={`${script.className} absolute right-8 top-7 hidden -rotate-2 text-2xl leading-6 text-white sm:block`}
-        >
-          Better Choices
-          <br />
-          Greener Tomorrows.
-        </p>
-      </section>
+      {/* Content wrapper */}
+      <div className="space-y-6 px-4 sm:px-6">
 
       {/* ================= OPTIMAL PLANTING WINDOW ================= */}
       <section className="grid grid-cols-1 gap-6 rounded-2xl bg-primary-50 p-6 sm:p-8 lg:grid-cols-2">
@@ -238,6 +258,7 @@ export default function RecommendationsPage() {
       </section>
 
       <AskAiBar title="Have questions? Ask FieldShift AI" subtitle="Get simple explanations, farming tips, or personalized advice in Bangla or English." placeholder="e.g. Can I plant earlier than 15 July?" />
+      </div>
     </div>
   );
 }

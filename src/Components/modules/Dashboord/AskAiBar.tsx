@@ -14,7 +14,7 @@ export default function AskAiBar({
   placeholder?: string;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="static flex w-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
         <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700">
           <Bot className="h-5 w-5" />

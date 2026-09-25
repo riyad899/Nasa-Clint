@@ -10,8 +10,7 @@ import {
   BotMessageSquare,
   BookOpen,
   Info,
-  X,
-  Leaf,
+  X
 } from "lucide-react";
 
 interface DashboardSidebarProps {
