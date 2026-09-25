@@ -13,13 +13,12 @@ export default function AuthLayout({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary-100 via-[#fbfaf7] to-[#fbfaf7]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between p-4 sm:p-6">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-900"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Home
-        </Link>
+        <Link href="/" className="flex items-center gap-2">
+  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-700 text-white">
+    <Leaf className="h-4 w-4" />
+  </div>
+  <span className="text-sm font-semibold tracking-tight text-slate-900">FieldShift</span>
+</Link>
 
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-700 text-white">

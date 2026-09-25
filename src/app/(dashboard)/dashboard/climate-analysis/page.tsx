@@ -2,35 +2,126 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { CloudRain, Thermometer, Droplet, Leaf, Info, Satellite, MapPin, BarChart3, Calendar, Sprout } from "lucide-react";
+import { Caveat } from "next/font/google";
+import {
+  CloudRain,
+  Thermometer,
+  Droplet,
+  Leaf,
+  Info,
+  Satellite,
+  MapPin,
+  BarChart3,
+  Calendar,
+  Sprout,
+  Quote,
+} from "lucide-react";
 import { DashboardHeaderSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 
+// Handwritten font — same one used across the app for consistency
+const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
+
 const metrics = [
-  { label: "Rainfall Onset", value: "+11 days", note: "Compared to 2001–2012", desc: "Rainy season now starts later in recent years.", icon: CloudRain, tone: "bg-sky-100 text-sky-600" },
-  { label: "Temperature", value: "+0.8°C", note: "During growing season", desc: "Higher temperatures may affect crop development.", icon: Thermometer, tone: "bg-rose-100 text-rose-600" },
-  { label: "Soil Moisture", value: "Moderate", note: "Current condition", desc: "Soil moisture is sufficient for transplanting soon.", icon: Droplet, tone: "bg-indigo-100 text-indigo-600" },
-  { label: "Vegetation Index (NDVI)", value: "Stable", note: "Recent trend", desc: "Vegetation condition looks healthy for the season.", icon: Leaf, tone: "bg-emerald-100 text-emerald-600" },
+  {
+    label: "Rainfall Onset",
+    value: "+11 days",
+    note: "Compared to 2001–2012",
+    desc: "Rainy season now starts later in recent years.",
+    icon: CloudRain,
+    card: "bg-sky-50 border-sky-100",
+    iconBg: "bg-white text-sky-600",
+    valueColor: "text-sky-900",
+  },
+  {
+    label: "Temperature",
+    value: "+0.8°C",
+    note: "During growing season",
+    desc: "Higher temperatures may affect crop development.",
+    icon: Thermometer,
+    card: "bg-rose-50 border-rose-100",
+    iconBg: "bg-white text-rose-600",
+    valueColor: "text-rose-600",
+  },
+  {
+    label: "Soil Moisture",
+    value: "Moderate",
+    note: "Current condition",
+    desc: "Soil moisture is sufficient for transplanting soon.",
+    icon: Droplet,
+    card: "bg-violet-50 border-violet-100",
+    iconBg: "bg-white text-violet-600",
+    valueColor: "text-violet-700",
+  },
+  {
+    label: "Vegetation Index (NDVI)",
+    value: "Stable",
+    note: "Recent trend",
+    desc: "Vegetation condition looks healthy for the season.",
+    icon: Leaf,
+    card: "bg-emerald-50 border-emerald-100",
+    iconBg: "bg-white text-emerald-600",
+    valueColor: "text-emerald-700",
+  },
 ];
 
 const months = ["May", "Jun", "Jul", "Aug", "Sep", "Oct"];
 const rainfall = { hist: [40, 85, 215, 210, 140, 65], recent: [55, 110, 185, 180, 110, 55] };
 const temperature = { hist: [27, 29, 31, 32, 31, 28], recent: [31, 33, 35, 36, 35, 32] };
 
-function BarChart() {
+// ================= CHARTS (with axes, gridlines, labels — matches the reference) =================
+
+function RainfallChart() {
+  const width = 320;
+  const height = 180;
+  const padL = 34;
+  const padR = 6;
+  const padT = 6;
+  const padB = 22;
+  const chartW = width - padL - padR;
+  const chartH = height - padT - padB;
   const max = 250;
+  const ticks = [0, 50, 100, 150, 200, 250];
+  const groupW = chartW / months.length;
+  const barW = 12;
+
   return (
-    <svg viewBox="0 0 300 140" className="w-full">
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
+      <text
+        x={11}
+        y={padT + chartH / 2}
+        fontSize="8.5"
+        fill="#94a3b8"
+        textAnchor="middle"
+        transform={`rotate(-90, 11, ${padT + chartH / 2})`}
+      >
+        Rainfall (mm)
+      </text>
+
+      {ticks.map((t) => {
+        const y = padT + chartH - (t / max) * chartH;
+        return (
+          <g key={t}>
+            <line x1={padL} x2={width - padR} y1={y} y2={y} stroke="#eef2f0" strokeWidth="1" />
+            <text x={padL - 6} y={y + 3} fontSize="8" textAnchor="end" fill="#94a3b8">
+              {t}
+            </text>
+          </g>
+        );
+      })}
+
       {months.map((m, i) => {
-        const x = i * 50 + 10;
-        const hHist = (rainfall.hist[i] / max) * 110;
-        const hRecent = (rainfall.recent[i] / max) * 110;
+        const gx = padL + i * groupW;
+        const hHist = (rainfall.hist[i] / max) * chartH;
+        const hRecent = (rainfall.recent[i] / max) * chartH;
         return (
           <g key={m}>
-            <rect x={x} y={120 - hHist} width="14" height={hHist} rx="2" fill="#b8dfc4" />
-            <rect x={x + 16} y={120 - hRecent} width="14" height={hRecent} rx="2" fill="#1c5439" />
-            <text x={x + 15} y="134" fontSize="9" textAnchor="middle" fill="#94a3b8">{m}</text>
+            <rect x={gx + groupW / 2 - barW - 2} y={padT + chartH - hHist} width={barW} height={hHist} rx="2" fill="#b8dfc4" />
+            <rect x={gx + groupW / 2 + 2} y={padT + chartH - hRecent} width={barW} height={hRecent} rx="2" fill="#1c5439" />
+            <text x={gx + groupW / 2} y={height - 6} fontSize="9" textAnchor="middle" fill="#94a3b8">
+              {m}
+            </text>
           </g>
         );
       })}
@@ -38,16 +129,72 @@ function BarChart() {
   );
 }
 
-function LineChart() {
-  const min = 20, max = 40;
-  const toPoints = (arr: number[]) =>
-    arr.map((v, i) => `${i * 60 + 10},${120 - ((v - min) / (max - min)) * 110}`).join(" ");
+function TemperatureChart() {
+  const width = 320;
+  const height = 180;
+  const padL = 34;
+  const padR = 6;
+  const padT = 6;
+  const padB = 22;
+  const chartW = width - padL - padR;
+  const chartH = height - padT - padB;
+  const min = 20;
+  const max = 40;
+  const ticks = [20, 25, 30, 35, 40];
+  const stepX = chartW / (months.length - 1);
+
+  const toXY = (arr: number[]) =>
+    arr.map((v, i) => [padL + i * stepX, padT + chartH - ((v - min) / (max - min)) * chartH]);
+
+  const histPts = toXY(temperature.hist);
+  const recentPts = toXY(temperature.recent);
+  const linePoints = (pts: number[][]) => pts.map(([x, y]) => `${x},${y}`).join(" ");
+  const areaPath = (pts: number[][]) => {
+    const top = pts.map(([x, y]) => `${x},${y}`).join(" L ");
+    const baseY = padT + chartH;
+    return `M ${pts[0][0]},${baseY} L ${top} L ${pts[pts.length - 1][0]},${baseY} Z`;
+  };
+
   return (
-    <svg viewBox="0 0 300 140" className="w-full">
-      <polyline points={toPoints(temperature.hist)} fill="none" stroke="#b8dfc4" strokeWidth="2.5" />
-      <polyline points={toPoints(temperature.recent)} fill="none" stroke="#1c5439" strokeWidth="2.5" />
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
+      <defs>
+        <linearGradient id="tempFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1c5439" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#1c5439" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      <text
+        x={11}
+        y={padT + chartH / 2}
+        fontSize="8.5"
+        fill="#94a3b8"
+        textAnchor="middle"
+        transform={`rotate(-90, 11, ${padT + chartH / 2})`}
+      >
+        Temperature (°C)
+      </text>
+
+      {ticks.map((t) => {
+        const y = padT + chartH - ((t - min) / (max - min)) * chartH;
+        return (
+          <g key={t}>
+            <line x1={padL} x2={width - padR} y1={y} y2={y} stroke="#eef2f0" strokeWidth="1" />
+            <text x={padL - 6} y={y + 3} fontSize="8" textAnchor="end" fill="#94a3b8">
+              {t}
+            </text>
+          </g>
+        );
+      })}
+
+      <path d={areaPath(recentPts)} fill="url(#tempFill)" />
+      <polyline points={linePoints(histPts)} fill="none" stroke="#b8dfc4" strokeWidth="2.5" />
+      <polyline points={linePoints(recentPts)} fill="none" stroke="#1c5439" strokeWidth="2.5" />
+
       {months.map((m, i) => (
-        <text key={m} x={i * 60 + 10} y="134" fontSize="9" textAnchor="middle" fill="#94a3b8">{m}</text>
+        <text key={m} x={padL + i * stepX} y={height - 6} fontSize="9" textAnchor="middle" fill="#94a3b8">
+          {m}
+        </text>
       ))}
     </svg>
   );
@@ -82,15 +229,40 @@ function ClimateAnalysisContent() {
         />
       </DashboardHeaderSlot>
 
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#fdf3e0] via-[#f3e0bd] to-[#2f4f38] px-6 py-8 sm:px-10">
-        <h1 className="text-3xl font-semibold text-slate-900">Climate Analysis</h1>
-        {hasResult ? (
-          <p className="mt-1 text-lg font-medium text-slate-800">{location} · {crop}</p>
-        ) : null}
-        <p className="mt-2 max-w-md text-sm text-slate-700">
-          Insights from NASA Earth observations to help you make better farming decisions.
-        </p>
-        <p className="mt-4 hidden -rotate-2 font-serif text-sm italic text-[#f4ead2] sm:block">
+      {/* ================= HERO =================
+          Light background with a photo bleeding off the right edge, fading
+          into the page background — same treatment as the landing page,
+          not a full dark-overlay banner. */}
+      <section className="relative min-h-[190px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
+        <div className="absolute inset-y-0 right-0 w-[62%] sm:w-1/2">
+          <div
+            className="absolute inset-0 bg-cover bg-[center_60%]"
+            style={{
+              backgroundImage:
+                "url('https://i.ibb.co.com/Q795jpb3/Chat-GPT-Image-Sep-25-2026-11-47-57-AM.png')",
+            }}
+          />
+          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
+        </div>
+
+        <div className="relative max-w-sm">
+          <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">Climate Analysis</h1>
+
+          {hasResult ? (
+            <p className="mt-1 text-lg font-semibold text-[#173d2a]">
+              {location} · {crop}
+            </p>
+          ) : null}
+
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            Insights from NASA Earth observations to help you make better farming
+            decisions.
+          </p>
+        </div>
+
+        <p
+          className={`${script.className} absolute right-6 top-6 hidden -rotate-2 text-2xl leading-6 text-white  sm:right-10 sm:block`}
+        >
           Healthy Fields
           <br />
           Brighter Tomorrows
@@ -101,14 +273,14 @@ function ClimateAnalysisContent() {
         <>
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {metrics.map((m) => (
-              <div key={m.label} className="rounded-2xl border border-slate-100 bg-white p-4">
+              <div key={m.label} className={`rounded-2xl border p-4 ${m.card}`}>
                 <div className="flex items-center gap-2">
-                  <span className={`flex h-8 w-8 items-center justify-center rounded-full ${m.tone}`}>
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full shadow-sm ${m.iconBg}`}>
                     <m.icon className="h-4 w-4" />
                   </span>
                   <span className="text-xs font-medium text-slate-500">{m.label}</span>
                 </div>
-                <p className="mt-2 text-2xl font-semibold text-slate-900">{m.value}</p>
+                <p className={`mt-2 text-2xl font-semibold ${m.valueColor}`}>{m.value}</p>
                 <p className="mt-1 flex items-center gap-1 text-[11px] text-slate-400">
                   {m.note} <Info className="h-3 w-3" />
                 </p>
@@ -127,7 +299,7 @@ function ClimateAnalysisContent() {
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary-200" /> 2001–2012 (Historical)</span>
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary-800" /> 2013–2025 (Recent)</span>
               </div>
-              <BarChart />
+              <RainfallChart />
             </div>
             <div className="rounded-2xl border border-slate-100 bg-white p-5">
               <div className="flex items-center justify-between">
@@ -138,7 +310,7 @@ function ClimateAnalysisContent() {
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary-200" /> 2001–2012 (Historical)</span>
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary-800" /> 2013–2025 (Recent)</span>
               </div>
-              <LineChart />
+              <TemperatureChart />
             </div>
           </section>
 
@@ -148,9 +320,12 @@ function ClimateAnalysisContent() {
                 <Sprout className="h-4 w-4" /> Recommended Planting Window
               </p>
               <h3 className="mt-2 text-4xl font-bold text-primary-900">15 – 25 JULY</h3>
-              <span className="mt-3 inline-block rounded-full bg-clay-100 px-3 py-1 text-xs font-semibold text-clay-600">
-                ↗ 11 days later
-              </span>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full bg-clay-100 px-3 py-1 text-xs font-semibold text-clay-600">
+                  ↗ 11 days later
+                </span>
+                <span className="text-xs text-slate-500">Compared to historical period (2001–2012)</span>
+              </div>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 Based on NASA climate data analysis, the suitable transplanting window for {crop || "your crop"} in {location || "your area"} may need to shift approximately 11 days later due to changes in rainfall patterns and temperature.
               </p>
@@ -163,10 +338,36 @@ function ClimateAnalysisContent() {
                 </button>
               </div>
             </div>
-            <div className="relative flex items-end overflow-hidden rounded-2xl bg-gradient-to-b from-emerald-200 to-emerald-800 p-5">
-              <p className="text-sm italic text-white/90">
-                &ldquo;Adapting today for a more secure tomorrow.&rdquo;
-              </p>
+
+            {/* Photo + floating quote card — swap the backgroundImage URL for your
+                own rice-field photo (same workflow as the other hero images) */}
+            <div
+              className="relative min-h-[260px] overflow-hidden rounded-2xl bg-cover bg-center"
+              style={{
+                backgroundImage:
+                  "url('REPLACE_WITH_YOUR_RICE_FIELD_PHOTO_URL')",
+              }}
+            >
+             <div
+  className="relative min-h-[320px] overflow-hidden rounded-2xl bg-cover bg-center"
+  style={{
+    backgroundImage:
+      "url('https://i.ibb.co.com/PG31PycM/Chat-GPT-Image-Sep-24-2026-05-42-01-PM.png')",
+  }}
+>
+  {/* Background overlay */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+
+  <div className="absolute bottom-5 right-5 max-w-[190px] rounded-xl bg-[#0f3d2a]/90 p-4 text-white shadow-lg backdrop-blur-sm">
+    <Quote className="h-5 w-5 text-white/60" />
+
+    <p className="mt-2 text-sm italic leading-snug">
+      Adapting today for a more secure tomorrow.
+    </p>
+
+    <div className="mt-3 h-px w-8 bg-white/40" />
+  </div>
+</div>
             </div>
           </section>
         </>
@@ -192,7 +393,7 @@ function ClimateAnalysisContent() {
               </div>
             ))}
           </div>
-          <p className="mt-8 -rotate-1 font-serif text-base italic text-primary-700">Same Land. New Possibilities.</p>
+          <p className={`${script.className} mt-8 -rotate-1 text-xl text-primary-700`}>Same Land. New Possibilities.</p>
         </section>
       )}
 

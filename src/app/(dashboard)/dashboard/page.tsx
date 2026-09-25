@@ -2,17 +2,55 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sprout, MessageCircle, BookOpen, BarChart3, ChevronRight, Satellite, Cog, ArrowRight } from "lucide-react";
+import { Caveat } from "next/font/google";
+import {
+  ArrowLeft,
+  Sprout,
+  MessageCircle,
+  BookOpen,
+  BarChart3,
+  ChevronRight,
+  Satellite,
+  Cog,
+  ArrowRight,
+} from "lucide-react";
 import { DashboardHeaderSlot } from "../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 import { useRouter } from "next/navigation";
 
+// Handwritten font — same one used on the landing page for consistency
+const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
+
 const quickActions = [
-  { title: "Analyze My Farm", desc: "Get climate insights for your location", icon: Sprout, tone: "bg-primary-100 text-primary-700", href: "/dashboard/climate-analysis" },
-  { title: "Ask FieldShift AI", desc: "Get answers to your farming questions", icon: MessageCircle, tone: "bg-sky-100 text-sky-600", href: "/dashboard/ask-ai" },
-  { title: "Learn Something New", desc: "Simple guides for smarter farming", icon: BookOpen, tone: "bg-amber-100 text-amber-600", href: "/dashboard/learn" },
-  { title: "See Example Results", desc: "Explore sample analysis and recommendations", icon: BarChart3, tone: "bg-violet-100 text-violet-600", href: "/dashboard/recommendations" },
+  {
+    title: "Analyze My Farm",
+    desc: "Get climate insights for your location",
+    icon: Sprout,
+    tone: "bg-primary-100 text-primary-700",
+    href: "/dashboard/climate-analysis",
+  },
+  {
+    title: "Ask FieldShift AI",
+    desc: "Get answers to your farming questions",
+    icon: MessageCircle,
+    tone: "bg-sky-100 text-sky-600",
+    href: "/dashboard/ask-ai",
+  },
+  {
+    title: "Learn Something New",
+    desc: "Simple guides for smarter farming",
+    icon: BookOpen,
+    tone: "bg-amber-100 text-amber-600",
+    href: "/dashboard/learn",
+  },
+  {
+    title: "See Example Results",
+    desc: "Explore sample analysis and recommendations",
+    icon: BarChart3,
+    tone: "bg-violet-100 text-violet-600",
+    href: "/dashboard/recommendations",
+  },
 ];
 
 const recentAnalyses = [
@@ -22,9 +60,24 @@ const recentAnalyses = [
 ];
 
 const steps = [
-  { title: "1. NASA Data", desc: "We use satellite data on rainfall, temperature, soil moisture and more.", icon: Satellite },
-  { title: "2. Smart Analysis", desc: "Our system analyzes climate trends for your location and crop.", icon: Cog },
-  { title: "3. Actionable Insights", desc: "You get simple, practical recommendations for a resilient tomorrow.", icon: Sprout },
+  {
+    title: "1. NASA Data",
+    desc: "We use satellite data on rainfall, temperature, soil moisture and more.",
+    icon: Satellite,
+    filled: true,
+  },
+  {
+    title: "2. Smart Analysis",
+    desc: "Our system analyzes climate trends for your location and crop.",
+    icon: Cog,
+    filled: false,
+  },
+  {
+    title: "3. Actionable Insights",
+    desc: "You get simple, practical recommendations for a resilient tomorrow.",
+    icon: Sprout,
+    filled: false,
+  },
 ];
 
 export default function DashboardHomePage() {
@@ -46,47 +99,69 @@ export default function DashboardHomePage() {
         </button>
       </DashboardHeaderSlot>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#fdf3e0] via-[#f3e0bd] to-[#2f4f38]" />
-        <div className="relative px-6 pb-16 pt-8 sm:px-10 sm:pt-10">
-          <h1 className="max-w-lg text-3xl font-semibold text-slate-900 sm:text-4xl">
-            Let&apos;s grow a stronger tomorrow 🌱
-          </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-700">
-            FieldShift uses NASA Earth observations to help you make better farming decisions — simple, practical, and tailored to your land.
-          </p>
-          <div className="mt-6 hidden -rotate-2 font-serif text-sm italic text-[#f4ead2] sm:block">
-            Same Land.
-            <br />
-            New Possibilities.
-          </div>
+      
+      <section className="relative min-h-[220px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
+        <div className="absolute inset-y-0 right-0 w-[58%] sm:w-1/2">
+          <div
+            className="absolute inset-0 bg-cover bg-[center_60%]"
+            style={{
+              backgroundImage:
+                "url('https://i.ibb.co.com/HDzJ2h3N/Screenshot-2026-09-24-at-11-31-21-PM.png')",
+            }}
+          />
+          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
         </div>
 
-        <div className="relative -mt-10 px-4 pb-6 sm:px-8">
-          <FilterBar
-            variant="card"
-            location={location}
-            crop={crop}
-            priority={priority}
-            onLocationChange={setLocation}
-            onCropChange={setCrop}
-            onPriorityChange={setPriority}
-            onSubmit={handleAnalyze}
-          />
-          <p className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-            <span>💡 Not sure? Ask FieldShift AI or explore our learning section!</span>
-            <span>Your data is analyzed using NASA Earth observations.</span>
+        <div className="relative max-w-md">
+          <h1 className="flex items-center gap-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
+            Let&apos;s grow a stronger tomorrow
+            
+          </h1>
+
+          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            FieldShift uses NASA Earth observations to help you make better farming
+            decisions — simple, practical, and tailored to your land.
           </p>
         </div>
+
+        <p
+          className={`${script.className} absolute right-6 top-7 hidden -rotate-2 text-2xl leading-6 text-[#173d2a] sm:right-10 sm:block`}
+        >
+          Same Land.
+          <br />
+          New Possibilities.
+        </p>
       </section>
+
+      {/* Filter card */}
+      <div className="relative px-4 sm:px-6">
+        <FilterBar
+          variant="card"
+          location={location}
+          crop={crop}
+          priority={priority}
+          onLocationChange={setLocation}
+          onCropChange={setCrop}
+          onPriorityChange={setPriority}
+          onSubmit={handleAnalyze}
+        />
+
+        <p className="mt-3 flex flex-wrap items-center justify-between gap-2 px-2 text-xs text-slate-500">
+          <span>💡 Not sure? Ask FieldShift AI or explore our learning section!</span>
+          <span>Your data is analyzed using NASA Earth observations.</span>
+        </p>
+      </div>
 
       {/* Quick actions */}
       <section>
         <h2 className="text-base font-semibold text-slate-900">Quick Actions</h2>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((a) => (
-            <Link key={a.title} href={a.href} className="rounded-2xl border border-slate-100 bg-white p-4 transition hover:shadow-sm">
+            <Link
+              key={a.title}
+              href={a.href}
+              className="rounded-2xl border border-slate-100 bg-white p-4 transition hover:shadow-sm"
+            >
               <span className={`flex h-10 w-10 items-center justify-center rounded-full ${a.tone}`}>
                 <a.icon className="h-5 w-5" />
               </span>
@@ -108,11 +183,17 @@ export default function DashboardHomePage() {
           </div>
           <div className="mt-3 divide-y divide-slate-100">
             {recentAnalyses.map((r) => (
-              <Link key={r.location} href="/dashboard/recommendations" className="flex items-center justify-between py-3 hover:bg-slate-50/60">
+              <Link
+                key={r.location}
+                href="/dashboard/recommendations"
+                className="flex items-center justify-between py-3 hover:bg-slate-50/60"
+              >
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{r.icon}</span>
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">{r.location} · {r.crop}</p>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {r.location} · {r.crop}
+                    </p>
                     <p className="text-xs text-slate-400">{r.tag}</p>
                   </div>
                 </div>
@@ -136,17 +217,25 @@ export default function DashboardHomePage() {
             {steps.map((s, i) => (
               <React.Fragment key={s.title}>
                 <div className="flex-1 text-center">
-                  <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-700">
+                  <span
+                    className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${
+                      s.filled
+                        ? "bg-[#0f3d2a] text-white"
+                        : "bg-primary-50 text-primary-700"
+                    }`}
+                  >
                     <s.icon className="h-5 w-5" />
                   </span>
                   <p className="mt-2 text-xs font-semibold text-slate-800">{s.title}</p>
                   <p className="mt-1 text-[11px] leading-relaxed text-slate-400">{s.desc}</p>
                 </div>
-                {i < steps.length - 1 && <div className="mt-6 h-px w-6 flex-shrink-0 bg-slate-200" />}
+                {i < steps.length - 1 && (
+                  <ArrowRight className="mt-5 h-4 w-4 flex-shrink-0 text-slate-300" />
+                )}
               </React.Fragment>
             ))}
           </div>
-          <p className="mt-4 -rotate-1 text-center font-serif text-sm italic text-primary-700">
+          <p className={`${script.className} mt-4 -rotate-1 text-center text-lg text-primary-700`}>
             Healthy Fields. Brighter Tomorrows.
           </p>
         </div>

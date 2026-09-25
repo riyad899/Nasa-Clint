@@ -1,9 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bot, Send, Paperclip, ChevronDown, RefreshCw, Pencil, MapPin, Leaf, Target, BookOpen, Droplet, CloudRain, RotateCw, BarChart3 } from "lucide-react";
+import { Caveat } from "next/font/google";
+import {
+  Bot,
+  Send,
+  Paperclip,
+  ChevronDown,
+  RefreshCw,
+  Pencil,
+  MapPin,
+  Leaf,
+  Target,
+  BookOpen,
+  Droplet,
+  CloudRain,
+  RotateCw,
+  BarChart3,
+  ArrowRight,
+} from "lucide-react";
 import { DashboardHeaderSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
+
+// Handwritten font — same one used across the app for consistency
+const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
 
 const suggestions = [
   "কেন এই রোপণের সময় পরামর্শ দেওয়া হয়েছে?",
@@ -15,17 +35,23 @@ const suggestions = [
 ];
 
 const resources = [
-  { label: "Aman Rice Farming Guide", icon: BookOpen, tone: "text-primary-600" },
-  { label: "Water Saving Techniques", icon: Droplet, tone: "text-rose-500" },
-  { label: "Understanding Rainfall Patterns", icon: CloudRain, tone: "text-sky-500" },
-  { label: "Crop Rotation Basics", icon: RotateCw, tone: "text-amber-500" },
+  { label: "Aman Rice Farming Guide", icon: BookOpen, tone: "bg-primary-50 text-primary-600" },
+  { label: "Water Saving Techniques", icon: Droplet, tone: "bg-rose-50 text-rose-500" },
+  { label: "Understanding Rainfall Patterns", icon: CloudRain, tone: "bg-sky-50 text-sky-500" },
+  { label: "Crop Rotation Basics", icon: RotateCw, tone: "bg-amber-50 text-amber-500" },
 ];
 
-interface Message { from: "bot" | "user"; text: string; showChartsCta?: boolean }
+interface Message {
+  from: "bot" | "user";
+  text: string;
+  time: string;
+  showChartsCta?: boolean;
+}
 
 const initialMessages: Message[] = [
   {
     from: "bot",
+    time: "10:24 AM",
     text:
       "Hello! I'm FieldShift AI 🌱\nI can help you understand climate trends, recommendations, and farming practices for your area. You can ask questions in Bangla or English.\n\nHere are some things you can ask:\n• Why is the recommended planting window 15 – 25 July?\n• What will happen if I plant earlier?\n• Which crop is better with less water?\n• How does rainfall affect Aman rice?\n• Tell me about crop rotation for my area.\n• Give me simple tips to save water.\n• Explain this result in simple Bangla.\n• Compare Aman rice and Boro rice.",
   },
@@ -39,13 +65,17 @@ export default function AskAiPage() {
   const [input, setInput] = useState("");
   const [lang, setLang] = useState<"BN" | "EN">("BN");
 
+  const timeNow = () =>
+    new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
   const send = (text: string) => {
     if (!text.trim()) return;
     setMessages((prev) => [
       ...prev,
-      { from: "user", text },
+      { from: "user", text, time: timeNow() },
       {
         from: "bot",
+        time: timeNow(),
         text:
           "রাজশাহীতে আমন ধানের জন্য ১৫ – ২৫ জুলাই রোপণের পরামর্শ দেওয়া হয়েছে কারণ সাম্প্রতিক বছরে (২০১৩ – ২০২৫) বৃষ্টিপাতের শুরু আগের তুলনায় প্রায় ১১ দিন দেরিতে হয়েছে। এ সময় মাটিতে পর্যাপ্ত আর্দ্রতা থাকে, যা চারা রোপণের জন্য উপযুক্ত।\n\nএছাড়াও, এই সময়ে তাপমাত্রা এবং মাটির আর্দ্রতার অবস্থা ধানের ভালো বৃদ্ধির জন্য সহায়ক। যদি আপনি আরও বিস্তারিত জানতে চান, আমি চার্ট ও ডেটা দেখাতে পারি।",
         showChartsCta: true,
@@ -70,12 +100,34 @@ export default function AskAiPage() {
         />
       </DashboardHeaderSlot>
 
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#fdf3e0] via-[#f3e0bd] to-[#2f4f38] px-6 py-8 sm:px-10">
-        <h1 className="text-3xl font-semibold text-slate-900">Ask FieldShift AI</h1>
-        <p className="mt-2 max-w-md text-sm text-slate-700">
-          Get simple, practical answers to your farming questions using NASA data and our climate analysis. Ask in Bangla or English — anytime, anything.
-        </p>
-        <p className="mt-4 hidden -rotate-2 font-serif text-sm italic text-[#f4ead2] sm:block">
+      {/* ================= HERO =================
+          Light background with a photo bleeding off the right edge, fading
+          into the page background — same treatment as the other dashboard
+          pages, not a full dark-overlay banner. */}
+      <section className="relative min-h-[170px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
+        <div className="absolute inset-y-0 right-0 w-[58%] sm:w-1/2">
+          <div
+            className="absolute inset-0 bg-cover bg-[center_60%]"
+            style={{
+              backgroundImage:
+                "url('https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png')",
+            }}
+          />
+          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
+        </div>
+
+        <div className="relative max-w-md">
+          <h1 className="text-3xl font-semibold text-slate-900">Ask FieldShift AI</h1>
+
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            Get simple, practical answers to your farming questions using NASA data
+            and our climate analysis. Ask in Bangla or English — anytime, anything.
+          </p>
+        </div>
+
+        <p
+          className={`${script.className} absolute right-6 top-7 hidden -rotate-2 text-2xl leading-6 text-white sm:right-10 sm:block`}
+        >
           Your Farming
           <br />
           Companion, Always Here.
@@ -91,13 +143,16 @@ export default function AskAiPage() {
                 <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${m.from === "bot" ? "bg-primary-100 text-primary-700" : "bg-primary-800 text-white"}`}>
                   {m.from === "bot" ? <Bot className="h-4 w-4" /> : "R"}
                 </span>
-                <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${m.from === "bot" ? "bg-slate-50 text-slate-700" : "bg-primary-800 text-white"}`}>
-                  {m.text}
-                  {m.showChartsCta && (
-                    <button className="mt-3 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
-                      <BarChart3 className="h-3.5 w-3.5" /> Show data and charts
-                    </button>
-                  )}
+                <div className={`flex max-w-[80%] flex-col ${m.from === "user" ? "items-end" : "items-start"}`}>
+                  <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${m.from === "bot" ? "bg-slate-50 text-slate-700" : "bg-primary-800 text-white"}`}>
+                    {m.text}
+                    {m.showChartsCta && (
+                      <button className="mt-3 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+                        <BarChart3 className="h-3.5 w-3.5" /> Show data and charts
+                      </button>
+                    )}
+                  </div>
+                  <span className="mt-1 px-1 text-[11px] text-slate-300">{m.time}</span>
                 </div>
               </div>
             ))}
@@ -127,9 +182,12 @@ export default function AskAiPage() {
         {/* Right rail */}
         <div className="space-y-4">
           <div className="rounded-2xl border border-slate-100 bg-white p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-              <Bot className="h-4 w-4 text-primary-600" /> Suggested Questions
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                <Bot className="h-4 w-4 text-primary-600" /> Suggested Questions
+              </p>
+              <RefreshCw className="h-3.5 w-3.5 text-slate-300" />
+            </div>
             <div className="mt-3 space-y-2">
               {suggestions.map((s) => (
                 <button key={s} onClick={() => send(s)} className="flex w-full items-center justify-between rounded-lg border border-slate-100 px-3 py-2 text-left text-xs text-slate-600 hover:bg-slate-50">
@@ -157,12 +215,17 @@ export default function AskAiPage() {
           <div className="rounded-2xl border border-slate-100 bg-white p-4">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-slate-900">Helpful Resources</p>
-              <span className="text-xs font-medium text-primary-700">View All</span>
+              <span className="flex items-center gap-1 text-xs font-medium text-primary-700">
+                View All <ArrowRight className="h-3 w-3" />
+              </span>
             </div>
             <div className="mt-3 space-y-2.5">
               {resources.map((r) => (
-                <div key={r.label} className="flex items-center gap-2 text-xs text-slate-600">
-                  <r.icon className={`h-3.5 w-3.5 ${r.tone}`} /> {r.label}
+                <div key={r.label} className="flex items-center gap-2.5 text-xs text-slate-600">
+                  <span className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md ${r.tone}`}>
+                    <r.icon className="h-3.5 w-3.5" />
+                  </span>
+                  {r.label}
                 </div>
               ))}
             </div>

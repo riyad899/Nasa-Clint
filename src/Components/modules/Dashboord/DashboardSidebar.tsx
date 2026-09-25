@@ -49,7 +49,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
         }`}
       >
         <div className="flex h-[76px] items-center justify-between border-b border-primary-100 px-5">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-700 text-white">
               <Leaf className="h-4.5 w-4.5" />
             </span>

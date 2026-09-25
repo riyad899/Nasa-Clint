@@ -1,10 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar, Info, RefreshCw, Sprout, Droplet, TrendingUp, ShieldCheck, AlertTriangle, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Caveat } from "next/font/google";
+import {
+  Calendar,
+  Info,
+  RefreshCw,
+  Sprout,
+  Droplet,
+  TrendingUp,
+  ShieldCheck,
+  AlertTriangle,
+  ChevronRight,
+  ArrowRight,
+  CheckCircle2,
+  Quote,
+} from "lucide-react";
 import { DashboardHeaderSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
+
+// Handwritten font — same one used across the app for consistency
+const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
 
 const rotation = [
   { icon: "🌾", name: "Aman Rice", season: "Kharif Season", window: "Jul – Nov", points: ["Main crop", "Good climate suitability", "Moderate water need"] },
@@ -21,7 +38,7 @@ const benefits = [
   { label: "Better water\nmanagement", icon: Droplet, tone: "bg-sky-100 text-sky-600" },
   { label: "Healthier\nsoil", icon: Sprout, tone: "bg-primary-100 text-primary-700" },
   { label: "More stable\nyield", icon: TrendingUp, tone: "bg-emerald-100 text-emerald-600" },
-  { label: "Higher climate\nresilience", icon: ShieldCheck, tone: "bg-violet-100 text-violet-600" },
+  { label: "Higher climate\nresilience", icon: ShieldCheck, tone: "bg-primary-100 text-primary-700" },
 ];
 
 export default function RecommendationsPage() {
@@ -45,33 +62,37 @@ export default function RecommendationsPage() {
         />
       </DashboardHeaderSlot>
 
+      {/* ================= HERO ================= */}
       <section
-  className="relative min-h-[300px] overflow-hidden rounded-2xl bg-cover bg-center"
-  style={{
-    backgroundImage: `url("https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png")`,
-  }}
->
-  {/* Overlay */}
-  <div className="absolute inset-0 bg-gradient-to-r from-[#fdf3e0] via-[#f3e0bd]/75 to-transparent" />
+        className="relative min-h-[300px] overflow-hidden rounded-2xl bg-cover bg-center"
+        style={{
+          backgroundImage: `url("https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png")`,
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#fdf3e0] via-[#f3e0bd]/75 to-transparent" />
 
-  <div className="relative z-10 flex min-h-[300px] flex-col justify-center px-6 py-8 sm:px-10">
-    <h1 className="text-3xl font-semibold text-slate-900">
-      Recommendations
-    </h1>
+        <div className="relative z-10 flex min-h-[300px] flex-col justify-center px-6 py-8 sm:px-10">
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Recommendations
+          </h1>
 
-    <p className="mt-2 max-w-md text-sm leading-6 text-slate-700">
-      Actionable farming recommendations based on NASA Earth observations
-      and AI analysis.
-    </p>
+          <p className="mt-2 max-w-md text-sm leading-6 text-slate-700">
+            Actionable farming recommendations based on NASA Earth observations
+            and AI analysis.
+          </p>
+        </div>
 
-    <p className="mt-5 font-serif text-sm italic text-[#36543d]">
-      Better Choices
-      <br />
-      Greener Tomorrows.
-    </p>
-  </div>
-</section>
+        <p
+          className={`${script.className} absolute right-8 top-7 hidden -rotate-2 text-2xl leading-6 text-white sm:block`}
+        >
+          Better Choices
+          <br />
+          Greener Tomorrows.
+        </p>
+      </section>
 
+      {/* ================= OPTIMAL PLANTING WINDOW ================= */}
       <section className="grid grid-cols-1 gap-6 rounded-2xl bg-primary-50 p-6 sm:p-8 lg:grid-cols-2">
         <div>
           <p className="flex items-center gap-2 text-sm font-semibold text-primary-700">
@@ -91,31 +112,36 @@ export default function RecommendationsPage() {
             </button>
           </div>
         </div>
-        <div
-          className="relative min-h-[300px] flex flex-col justify-between overflow-hidden rounded-2xl bg-cover bg-center p-5 text-white"
-  style={{
-    backgroundImage:
-      "url('https://i.ibb.co.com/PG31PycM/Chat-GPT-Image-Sep-24-2026-05-42-01-PM.png')",
-            }}
-               >
-               {/* Dark overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-emerald-950/35 to-emerald-950/70" />
 
-               {/* Content */}
-                <div className="relative z-10">
-                 <p className="text-3xl font-bold">15 – 25</p>
-                 <p className="text-3xl font-bold">JULY</p>
-                  <p className="mt-1 text-xs text-white/80">
-                  Recommended planting window
-                 </p>
-               </div>
- 
-                 <p className="relative z-10 text-sm italic text-white/90">
-                  &ldquo;Plant at the right time, for a more resilient harvest.&rdquo;
-                 </p>
+        <div
+          className="relative min-h-[300px] overflow-hidden rounded-2xl bg-cover bg-center p-5"
+          style={{
+            backgroundImage:
+              "url('https://i.ibb.co.com/PG31PycM/Chat-GPT-Image-Sep-24-2026-05-42-01-PM.png')",
+          }}
+        >
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-emerald-950/35 to-emerald-950/70" />
+
+          {/* Date block */}
+          <div className="relative z-10 text-white">
+            <p className="text-3xl font-bold leading-tight">15 – 25</p>
+            <p className="text-3xl font-bold leading-tight">JULY</p>
+            <p className="mt-1 text-xs text-white/80">Recommended planting window</p>
           </div>
+
+          {/* Floating quote card */}
+          <div className="absolute bottom-5 right-5 max-w-[170px] rounded-xl bg-white/15 p-3.5 text-white shadow-lg backdrop-blur-sm">
+            <Quote className="h-4 w-4 text-white/70" />
+            <p className="mt-1.5 text-xs italic leading-snug">
+              Plant at the right time, for a more resilient harvest.
+            </p>
+            <div className="mt-2 h-px w-7 bg-white/40" />
+          </div>
+        </div>
       </section>
 
+      {/* ================= ROTATION + ALTERNATIVES ================= */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="rounded-2xl border border-slate-100 bg-white p-5">
           <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
@@ -142,15 +168,18 @@ export default function RecommendationsPage() {
                     ))}
                   </ul>
                 </div>
-                {i < rotation.length - 1 && <ChevronRight className="hidden h-5 w-5 flex-shrink-0 self-center text-slate-300 sm:block" />}
+                {i < rotation.length - 1 && <ArrowRight className="hidden h-5 w-5 flex-shrink-0 self-center text-slate-300 sm:block" />}
               </React.Fragment>
             ))}
           </div>
         </div>
 
         <div className="rounded-2xl border border-slate-100 bg-white p-5">
-          <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
-            <Sprout className="h-4 w-4 text-primary-600" /> Alternative Options
+          <h2 className="flex items-center justify-between text-base font-semibold text-slate-900">
+            <span className="flex items-center gap-2">
+              <Sprout className="h-4 w-4 text-primary-600" /> Alternative Options
+            </span>
+            <Info className="h-4 w-4 text-slate-300" />
           </h2>
           <div className="mt-4 space-y-3">
             {alternatives.map((a) => (
@@ -178,6 +207,7 @@ export default function RecommendationsPage() {
         </div>
       </section>
 
+      {/* ================= BENEFITS + NOTES ================= */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="rounded-2xl border border-slate-100 bg-white p-5">
           <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
@@ -207,7 +237,7 @@ export default function RecommendationsPage() {
         </div>
       </section>
 
-      <AskAiBar title="Have questions? Ask FieldShift AI" subtitle="Get simple explanations, farming tips, and more insights in Bangla or English." placeholder="e.g. Can I plant earlier than 15 July?" />
+      <AskAiBar title="Have questions? Ask FieldShift AI" subtitle="Get simple explanations, farming tips, or personalized advice in Bangla or English." placeholder="e.g. Can I plant earlier than 15 July?" />
     </div>
   );
 }
