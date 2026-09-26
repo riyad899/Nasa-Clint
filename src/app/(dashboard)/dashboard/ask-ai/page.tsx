@@ -19,7 +19,7 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
-import { DashboardHeaderSlot } from "../../header-context";
+import { TransparentNavSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 
 // Handwritten font — same one used across the app for consistency
@@ -85,10 +85,55 @@ export default function AskAiPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <DashboardHeaderSlot>
+    <div className="pb-8">
+      <TransparentNavSlot />
+
+      {/* ================= HERO ================= */}
+      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-[center_60%]"
+            style={{
+              backgroundImage:
+                "url('https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png')",
+            }}
+          />
+          {/* Minimal left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
+          {/* Top fade for readable navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
+          {/* Smoky bottom blend into #f5f7f5 */}
+          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
+        </div>
+
+        {/* Text content */}
+        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+          <div className="max-w-md">
+            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Ask FieldShift AI
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              Get simple, practical answers to your farming questions using NASA data
+              and our climate analysis. Ask in Bangla or English — anytime, anything.
+            </p>
+          </div>
+
+          <p
+            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+          >
+            Your Farming
+            <br />
+            Companion, Always Here.
+          </p>
+        </div>
+      </section>
+
+      {/* Floating FilterBar card */}
+      <div className="relative -mt-12 z-10 mb-8 px-4 sm:px-6">
         <FilterBar
-          variant="bar"
+          variant="card"
           location={location}
           crop={crop}
           priority={priority}
@@ -98,41 +143,10 @@ export default function AskAiPage() {
           onSubmit={() => {}}
           hasResult
         />
-      </DashboardHeaderSlot>
+      </div>
 
-      {/* ================= HERO =================
-          Light background with a photo bleeding off the right edge, fading
-          into the page background — same treatment as the other dashboard
-          pages, not a full dark-overlay banner. */}
-      <section className="relative min-h-[170px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
-        <div className="absolute inset-y-0 right-0 w-[58%] sm:w-1/2">
-          <div
-            className="absolute inset-0 bg-cover bg-[center_60%]"
-            style={{
-              backgroundImage:
-                "url('https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png')",
-            }}
-          />
-          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
-        </div>
-
-        <div className="relative max-w-md">
-          <h1 className="text-3xl font-semibold text-slate-900">Ask FieldShift AI</h1>
-
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Get simple, practical answers to your farming questions using NASA data
-            and our climate analysis. Ask in Bangla or English — anytime, anything.
-          </p>
-        </div>
-
-        <p
-          className={`${script.className} absolute right-6 top-7 hidden -rotate-2 text-2xl leading-6 text-white sm:right-10 sm:block`}
-        >
-          Your Farming
-          <br />
-          Companion, Always Here.
-        </p>
-      </section>
+      {/* Content wrapper */}
+      <div className="space-y-6 px-4 sm:px-6">
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         {/* Chat panel */}
@@ -232,6 +246,7 @@ export default function AskAiPage() {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

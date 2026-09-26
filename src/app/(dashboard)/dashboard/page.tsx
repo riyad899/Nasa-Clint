@@ -14,7 +14,7 @@ import {
   Cog,
   ArrowRight,
 } from "lucide-react";
-import { DashboardHeaderSlot } from "../header-context";
+import { TransparentNavSlot } from "../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 import { useRouter } from "next/navigation";
@@ -91,17 +91,14 @@ export default function DashboardHomePage() {
   };
 
   return (
-    <div className="space-y-6">
-      <DashboardHeaderSlot>
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800">
-          <ArrowLeft className="h-4 w-4" />
-          Good evening,
-        </button>
-      </DashboardHeaderSlot>
+    <div className="pb-8">
+      <TransparentNavSlot />
 
-      
-      <section className="relative min-h-[220px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
-        <div className="absolute inset-y-0 right-0 w-[58%] sm:w-1/2">
+      {/* ── HERO ─────────────────────────────────────────────────────────────
+          Full-bleed photo behind transparent navbar; smoky fade into page bg */}
+      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
           <div
             className="absolute inset-0 bg-cover bg-[center_60%]"
             style={{
@@ -109,32 +106,41 @@ export default function DashboardHomePage() {
                 "url('https://i.ibb.co.com/HDzJ2h3N/Screenshot-2026-09-24-at-11-31-21-PM.png')",
             }}
           />
-          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
+          {/* Minimal left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
+          {/* Top fade for readable navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
+          {/* Smoky bottom blend into #f5f7f5 */}
+          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
         </div>
 
-        <div className="relative max-w-md">
-          <h1 className="flex items-center gap-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
-            Let&apos;s grow a stronger tomorrow
-            
-          </h1>
+        {/* Text content */}
+        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+          <div className="max-w-md">
+            <h1 className="flex items-center gap-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Let&apos;s grow a stronger tomorrow
+            </h1>
 
-          <p className="mt-3 text-sm leading-relaxed text-slate-600">
-            FieldShift uses NASA Earth observations to help you make better farming
-            decisions — simple, practical, and tailored to your land.
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              FieldShift uses NASA Earth observations to help you make better farming
+              decisions — simple, practical, and tailored to your land.
+            </p>
+          </div>
+
+          <p
+            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+          >
+            Same Land.
+            <br />
+            New Possibilities.
           </p>
         </div>
-
-        <p
-          className={`${script.className} absolute right-6 top-7 hidden -rotate-2 text-2xl leading-6 text-[#173d2a] sm:right-10 sm:block`}
-        >
-          Same Land.
-          <br />
-          New Possibilities.
-        </p>
       </section>
 
-      {/* Filter card */}
-      <div className="relative px-4 sm:px-6">
+      {/* ── FILTER CARD ────────────────────────────────────────────────────────
+          -mt-12 pulls the card UP to overlap the bottom of the hero photo */}
+      <div className="relative -mt-12 z-10 mb-8 px-4 sm:px-6">
         <FilterBar
           variant="card"
           location={location}
@@ -152,10 +158,13 @@ export default function DashboardHomePage() {
         </p>
       </div>
 
+      {/* Main page content */}
+      <div className="space-y-6 px-4 sm:px-6">
+
       {/* Quick actions */}
       <section>
         <h2 className="text-base font-semibold text-slate-900">Quick Actions</h2>
-        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4  rounded-2xl">
           {quickActions.map((a) => (
             <Link
               key={a.title}
@@ -242,6 +251,7 @@ export default function DashboardHomePage() {
       </section>
 
       <AskAiBar />
+      </div>
     </div>
   );
 }

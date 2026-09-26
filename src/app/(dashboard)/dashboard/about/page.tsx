@@ -3,6 +3,7 @@
 import React from "react";
 import { Caveat } from "next/font/google";
 import { Leaf, Satellite, LineChart, Brain, BarChart3, Sun, CloudRain, Droplet, ArrowUpRight, Sprout, CloudSun, TrendingUp, Users, Quote, ArrowRight } from "lucide-react";
+import { TransparentNavSlot } from "../../header-context";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 
 // Handwritten font — same one used across the app for consistency
@@ -30,13 +31,13 @@ const impact = [
 
 export default function AboutPage() {
   return (
-    <div className="space-y-6">
-      {/* ================= HERO =================
-          Light background with a photo bleeding off the right edge, fading
-          into the page background — same treatment as the other dashboard
-          pages, not a full dark-overlay banner. */}
-      <section className="relative min-h-[190px] overflow-hidden rounded-2xl bg-[#fbfcfa] px-6 py-8 sm:px-10">
-        <div className="absolute inset-y-0 right-0 w-[58%] sm:w-1/2">
+    <div className="pb-8">
+      <TransparentNavSlot />
+
+      {/* ================= HERO ================= */}
+      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
           <div
             className="absolute inset-0 bg-cover bg-[center_60%]"
             style={{
@@ -44,30 +45,42 @@ export default function AboutPage() {
                 "url('https://i.ibb.co.com/VYKH4926/Chat-GPT-Image-Sep-25-2026-01-08-52-PM.png')",
             }}
           />
-          <div className="absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-[#fbfcfa] to-transparent" />
+          {/* Minimal left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
+          {/* Top fade for readable navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
+          {/* Smoky bottom blend into #f5f7f5 */}
+          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
         </div>
 
-        <div className="relative max-w-md">
-          <h1 className="text-3xl font-semibold text-slate-900">About FieldShift</h1>
+        {/* Text content */}
+        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+          <div className="max-w-md">
+            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">About FieldShift</h1>
 
-          <p className="mt-1 text-lg font-medium text-slate-800">
-            Adapting Farms with NASA Data
-          </p>
+            <p className="mt-1 text-lg font-medium text-slate-800">
+              Adapting Farms with NASA Data
+            </p>
 
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">
-            FieldShift uses NASA Earth observations and AI analysis to help farmers
-            make informed, climate-resilient decisions.
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              FieldShift uses NASA Earth observations and AI analysis to help farmers
+              make informed, climate-resilient decisions.
+            </p>
+          </div>
+
+          <p
+            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+          >
+            Healthy Fields
+            <br />
+            Brighter Tomorrows.
           </p>
         </div>
-
-        <p
-          className={`${script.className} absolute right-6 top-7 hidden -rotate-2 text-2xl leading-6 text-[#173d2a] sm:right-10 sm:block`}
-        >
-          Healthy Fields
-          <br />
-          Brighter Tomorrows.
-        </p>
       </section>
+
+      {/* Content wrapper */}
+      <div className="relative -mt-6 z-10 space-y-6 px-4 sm:px-6">
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="rounded-2xl border border-primary-100 bg-primary-50 p-5">
@@ -173,6 +186,7 @@ export default function AboutPage() {
       </section>
 
       <AskAiBar title="Ask FieldShift AI" subtitle="Ask anything about our project, data sources, or how it works." placeholder="e.g. How does FieldShift use NASA data?" />
+      </div>
     </div>
   );
 }
