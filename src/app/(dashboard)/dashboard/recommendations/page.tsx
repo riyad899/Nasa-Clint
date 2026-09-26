@@ -51,38 +51,25 @@ export default function RecommendationsPage() {
       <TransparentNavSlot />
 
       {/* ================= HERO ================= */}
-      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url("https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png")`,
-            }}
-          />
-          {/* Minimal left fade so heading text is legible */}
-          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
-          {/* Top fade for readable navbar */}
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
-          {/* Smoky bottom blend into #f5f7f5 */}
-          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
-          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
-        </div>
+      <section
+        className="relative min-h-[300px] overflow-hidden rounded-2xl bg-cover bg-center"
+        style={{
+          backgroundImage: `url("https://i.ibb.co.com/23cWFG8j/Chat-GPT-Image-Sep-24-2026-05-53-43-PM.png")`,
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#fdf3e0] via-[#f3e0bd]/75 to-transparent" />
 
-        {/* Text content */}
-        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
-          <div className="max-w-md">
-            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
-              Recommendations
-            </h1>
-            <p className="mt-1 text-lg font-semibold text-[#173d2a]">
-              {location} · {crop}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Actionable farming recommendations based on NASA Earth observations
-              and AI analysis.
-            </p>
-          </div>
+        <div className="relative z-10 flex min-h-[300px] flex-col justify-center px-6 py-8 sm:px-10">
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Recommendations
+          </h1>
+
+          <p className="mt-2 max-w-md text-sm leading-6 text-slate-700">
+            Actionable farming recommendations based on NASA Earth observations
+            and AI analysis.
+          </p>
+        </div>
 
           <p
             className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
@@ -128,17 +115,14 @@ export default function RecommendationsPage() {
               "url('https://i.ibb.co.com/PG31PycM/Chat-GPT-Image-Sep-24-2026-05-42-01-PM.png')",
           }}
         >
-          {/* Dark overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-emerald-950/35 to-emerald-950/70" />
 
-          {/* Date block */}
           <div className="relative z-10 text-white">
             <p className="text-3xl font-bold leading-tight">15 – 25</p>
             <p className="text-3xl font-bold leading-tight">JULY</p>
             <p className="mt-1 text-xs text-white/80">Recommended planting window</p>
           </div>
 
-          {/* Floating quote card */}
           <div className="absolute bottom-5 right-5 max-w-[170px] rounded-xl bg-white/15 p-3.5 text-white shadow-lg backdrop-blur-sm">
             <Quote className="h-4 w-4 text-white/70" />
             <p className="mt-1.5 text-xs italic leading-snug">
@@ -152,8 +136,12 @@ export default function RecommendationsPage() {
       {/* ================= ROTATION + ALTERNATIVES ================= */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="rounded-2xl border border-slate-100 bg-white p-5">
-          <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
-            <RefreshCw className="h-4 w-4 text-primary-600" /> Suggested Crop Rotation
+          {/* FIX 1: added justify-between + Info icon to match screenshot */}
+          <h2 className="flex items-center justify-between text-base font-semibold text-slate-900">
+            <span className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4 text-primary-600" /> Suggested Crop Rotation
+            </span>
+            <Info className="h-4 w-4 text-slate-300" />
           </h2>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
             {rotation.map((r, i) => (
@@ -225,7 +213,8 @@ export default function RecommendationsPage() {
             {benefits.map((b) => (
               <div key={b.label} className="rounded-xl border border-slate-100 p-4 text-center">
                 <span className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full ${b.tone}`}>
-                  <b.icon className="h-4.5 w-4.5" />
+                  {/* FIX 2: h-4.5/w-4.5 isn't a valid Tailwind size, icon wasn't shrinking properly */}
+                  <b.icon className="h-4 w-4" />
                 </span>
                 <p className="mt-2 whitespace-pre-line text-xs font-medium text-slate-700">{b.label}</p>
               </div>
