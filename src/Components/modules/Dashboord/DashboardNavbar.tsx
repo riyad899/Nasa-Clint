@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, Bell, ChevronDown, LogOut } from "lucide-react";
 import { useAuth, initials } from "@/lib/auth-context";
+import { useLanguage } from "@/lib/language-context";
 
 interface DashboardNavbarProps {
   onToggleSidebar: () => void;
@@ -19,10 +20,10 @@ export default function DashboardNavbar({
 }: DashboardNavbarProps) {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [lang, setLang] = useState<"EN" | "BN">("BN");
+  const { lang, setLang, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const displayName = user?.name || "Guest";
+  const displayName = user?.name || t("guest");
 
   const handleLogout = () => {
     logout();
@@ -86,7 +87,7 @@ export default function DashboardNavbar({
         </div>
 
         {/* Bell */}
-        <button className={bellCls} aria-label="Notifications">
+        <button className={bellCls} aria-label={t("notifications")}>
           <Bell className="h-5 w-5" />
         </button>
 
@@ -117,7 +118,7 @@ export default function DashboardNavbar({
                   onClick={handleLogout}
                   className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-rose-600 hover:bg-rose-50"
                 >
-                  <LogOut className="h-4 w-4" /> Log out
+                  <LogOut className="h-4 w-4" /> {t("logout")}
                 </button>
               </div>
             </>

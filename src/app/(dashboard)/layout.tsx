@@ -4,6 +4,7 @@ import DashboardNavbar from "@/Components/modules/Dashboord/DashboardNavbar";
 import DashboardSidebar from "@/Components/modules/Dashboord/DashboardSidebar";
 import React, { useState } from "react";
 import { DashboardHeaderProvider, useDashboardHeader } from "./header-context";
+import { LanguageProvider } from "@/lib/language-context";
 
 function Shell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,8 +34,10 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 export default function RootDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <DashboardHeaderProvider>
-      <Shell>{children}</Shell>
-    </DashboardHeaderProvider>
+    <LanguageProvider>
+      <DashboardHeaderProvider>
+        <Shell>{children}</Shell>
+      </DashboardHeaderProvider>
+    </LanguageProvider>
   );
 }

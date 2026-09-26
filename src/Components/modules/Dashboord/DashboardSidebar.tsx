@@ -13,23 +13,26 @@ import {
   X
 } from "lucide-react";
 
+import { useLanguage } from "@/lib/language-context";
+
 interface DashboardSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 const navItems = [
-  { label: "Home", href: "/dashboard", icon: Home },
-  { label: "Climate Analysis", href: "/dashboard/climate-analysis", icon: CloudSun },
-  { label: "Recommendations", href: "/dashboard/recommendations", icon: ClipboardCheck },
-  { label: "Why This Result?", href: "/dashboard/why-this-result", icon: HelpCircle },
-  { label: "Ask FieldShift AI", href: "/dashboard/ask-ai", icon: BotMessageSquare },
-  { label: "Learn", href: "/dashboard/learn", icon: BookOpen },
-  { label: "About", href: "/dashboard/about", icon: Info },
-];
+  { key: "nav_home", label: "Home", href: "/dashboard", icon: Home },
+  { key: "nav_climate_analysis", label: "Climate Analysis", href: "/dashboard/climate-analysis", icon: CloudSun },
+  { key: "nav_recommendations", label: "Recommendations", href: "/dashboard/recommendations", icon: ClipboardCheck },
+  { key: "nav_why_this_result", label: "Why This Result?", href: "/dashboard/why-this-result", icon: HelpCircle },
+  { key: "nav_ask_ai", label: "Ask FieldShift AI", href: "/dashboard/ask-ai", icon: BotMessageSquare },
+  { key: "nav_learn", label: "Learn", href: "/dashboard/learn", icon: BookOpen },
+  { key: "nav_about", label: "About", href: "/dashboard/about", icon: Info },
+] as const;
 
 export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const { t, lang } = useLanguage();
 
   return (
     <>
@@ -65,7 +68,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
       </span>
 
       <span className="mt-1 block text-[9px] leading-none text-primary-600">
-        Adapting Farms with NASA Data
+        {t("tagline")}
       </span>
     </div>
   </Link>
@@ -94,7 +97,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                 }`}
               >
                 <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary-700" : "text-slate-400"}`} />
-                {item.label}
+                {t(item.key, item.label)}
               </Link>
             );
           })}
@@ -111,10 +114,10 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
           {/* Text sits on top, offset so it doesn't collide with the leaf */}
           <div className="relative z-10 ml-12 mt-[-30px] pt-[-50px]">
             <p className="max-w-[150px] text-[11px] font-medium leading-[1.25] text-[#163b36]">
-              A Climate-Resilient Future for Farmers
+              {lang === "BN" ? "কৃষকদের জন্য জলবায়ু-সহনশীল ভবিষ্যৎ" : "A Climate-Resilient Future for Farmers"}
             </p>
             <p className="mt-2 max-w-[155px] text-[9px] leading-[1.35] text-slate-500">
-              Earth data. Local impact. Stronger farms.
+              {lang === "BN" ? "পৃথিবীর উপাত্ত। স্থানীয় অগ্রগতি। সমৃদ্ধ খামার।" : "Earth data. Local impact. Stronger farms."}
             </p>
           </div>
         </div>
