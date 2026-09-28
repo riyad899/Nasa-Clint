@@ -21,7 +21,7 @@ const guides = [
     title: "What is NASA Earth Data?",
     desc: "Learn how satellite data helps us understand climate and support farming.",
     read: "5 min read",
-    
+
     from: "from-sky-400",
     to: "to-indigo-700",
     image:
@@ -32,7 +32,7 @@ const guides = [
     title: "How Rainfall Affects Crops",
     desc: "Understand rainfall patterns, seasonal changes, and their impact on crop timing.",
     read: "4 min read",
-    
+
     from: "from-slate-400",
     to: "to-slate-600",
     image:
@@ -43,7 +43,7 @@ const guides = [
     title: "Soil Moisture and Plant Health",
     desc: "See how soil moisture influences growth and yield.",
     read: "4 min read",
-    
+
     from: "from-amber-700",
     to: "to-primary-800",
     image:
@@ -54,7 +54,7 @@ const guides = [
     title: "What is NDVI?",
     desc: "Learn how vegetation index shows plant health from space.",
     read: "3 min read",
-    
+
     from: "from-primary-400",
     to: "to-primary-800",
     image:
@@ -164,7 +164,7 @@ export default function LearnPage() {
         <div className="absolute inset-0 bg-black/20" />
 
         <div className="relative flex h-full items-center justify-center">
-          
+
         </div>
       </div>
 
@@ -228,7 +228,7 @@ export default function LearnPage() {
         </div>
       </section>
 
-      <AskAiBar title="Ask FieldShift AI" subtitle="Get simple explanations, farming tips, or learn more about any topic in Bangla or English." placeholder="e.g. What is NDVI?" />
+      <AskAiBar title="Ask CropWise AI" subtitle="Get simple explanations, farming tips, or learn more about any topic in Bangla or English." placeholder="e.g. What is NDVI?" />
       </div>
     </div>
   );

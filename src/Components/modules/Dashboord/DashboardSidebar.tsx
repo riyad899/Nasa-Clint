@@ -25,7 +25,7 @@ const navItems = [
   { key: "nav_climate_analysis", label: "Climate Analysis", href: "/dashboard/climate-analysis", icon: CloudSun },
   { key: "nav_recommendations", label: "Recommendations", href: "/dashboard/recommendations", icon: ClipboardCheck },
   { key: "nav_why_this_result", label: "Why This Result?", href: "/dashboard/why-this-result", icon: HelpCircle },
-  { key: "nav_ask_ai", label: "Ask FieldShift AI", href: "/dashboard/ask-ai", icon: BotMessageSquare },
+  { key: "nav_ask_ai", label: "Ask CropWise AI", href: "/dashboard/ask-ai", icon: BotMessageSquare },
   { key: "nav_learn", label: "Learn", href: "/dashboard/learn", icon: BookOpen },
   { key: "nav_about", label: "About", href: "/dashboard/about", icon: Info },
 ] as const;
@@ -54,7 +54,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
     {/* Leaf Image */}
     <Image
       src="/Green%20Leaf.png"
-      alt="FieldShift"
+      alt="CropWise AI"
       width={70}
       height={70}
       className="h-15 w-15 shrink-0 object-contain"
@@ -64,7 +64,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
     {/* Text over image */}
     <div className="absolute left-[55px] top-1/2 -translate-y-1/2 whitespace-nowrap">
       <span className="block text-[20px] font-semibold leading-none text-slate-900">
-        FieldShift
+        CropWise AI
       </span>
 
       <span className="mt-1 block text-[9px] leading-none text-primary-600">

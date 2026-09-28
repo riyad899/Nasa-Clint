@@ -137,7 +137,7 @@ export default function LocationMapSection({
     const marker = new mapboxgl.Marker({ element: el, anchor: "bottom" })
       .setLngLat([longitude, latitude])
       .setPopup(
-        new mapboxgl.Popup({ offset: 25, closeButton: false, className: "fieldshift-popup" }).setHTML(`
+        new mapboxgl.Popup({ offset: 25, closeButton: false, className: "cropwise-popup" }).setHTML(`
           <div style="padding: 8px 12px; font-family: system-ui, sans-serif;">
             <p style="margin:0; font-weight:600; font-size:14px; color:#0f3d2a;">📍 ${locationName}</p>
             <p style="margin:4px 0 0; font-size:11px; color:#64748b;">

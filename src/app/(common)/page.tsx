@@ -109,7 +109,7 @@ export default function HomePage() {
 
         {/* Description */}
         <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-500 lg:text-[17px]">
-          FieldShift turns satellite data into simple, practical insights so
+          CropWise AI turns satellite data into simple, practical insights so
           farmers can adapt, plan, and grow with confidence.
         </p>
 

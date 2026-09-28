@@ -95,19 +95,7 @@ export default function RecommendationsPage() {
       </section>
 
       {/* Floating FilterBar card */}
-      <div className="relative -mt-12 z-10 mb-8 px-4 sm:px-6">
-        <FilterBar
-          variant="card"
-          location={location}
-          crop={crop}
-          priority={priority}
-          onLocationChange={setLocation}
-          onCropChange={setCrop}
-          onPriorityChange={setPriority}
-          onSubmit={() => {}}
-          hasResult
-        />
-      </div>
+
 
       {/* Content wrapper */}
       <div className="space-y-6 px-4 sm:px-6">
@@ -257,7 +245,7 @@ export default function RecommendationsPage() {
         </div>
       </section>
 
-      <AskAiBar title="Have questions? Ask FieldShift AI" subtitle="Get simple explanations, farming tips, or personalized advice in Bangla or English." placeholder="e.g. Can I plant earlier than 15 July?" />
+      <AskAiBar title="Have questions? Ask CropWise AI" subtitle="Get simple explanations, farming tips, or personalized advice in Bangla or English." placeholder="e.g. Can I plant earlier than 15 July?" />
       </div>
     </div>
   );

@@ -17,14 +17,14 @@ export default function AuthLayout({
   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-700 text-white">
     <Leaf className="h-4 w-4" />
   </div>
-  <span className="text-sm font-semibold tracking-tight text-slate-900">FieldShift</span>
+  <span className="text-sm font-semibold tracking-tight text-slate-900">CropWise AI</span>
 </Link>
 
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-700 text-white">
             <Leaf className="h-4 w-4" />
           </div>
-          <span className="text-sm font-semibold tracking-tight text-slate-900">FieldShift</span>
+          <span className="text-sm font-semibold tracking-tight text-slate-900">CropWise AI</span>
         </div>
       </div>
 
@@ -33,7 +33,7 @@ export default function AuthLayout({
       </main>
 
       <div className="relative z-10 py-4 text-center text-xs text-slate-400">
-        © {new Date().getFullYear()} FieldShift. Same Land. New Insights. Stronger Futures.
+        © {new Date().getFullYear()} CropWise AI. Same Land. New Insights. Stronger Futures.
       </div>
     </div>
   );

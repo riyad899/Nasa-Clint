@@ -4,11 +4,11 @@ import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | FieldShift",
-    default: "FieldShift — Farms Today. A Safer Tomorrow.",
+    template: "%s | CropWise AI",
+    default: "CropWise AI — Farms Today. A Safer Tomorrow.",
   },
   description:
-    "FieldShift turns NASA Earth observation data into simple, practical climate insights so farmers can adapt, plan, and grow with confidence.",
+    "CropWise AI turns NASA Earth observation data into simple, practical climate insights so farmers can adapt, plan, and grow with confidence.",
   keywords: [
     "climate smart farming",
     "NASA earth data",

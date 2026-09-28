@@ -53,7 +53,7 @@ const initialMessages: Message[] = [
     from: "bot",
     time: "10:24 AM",
     text:
-      "Hello! I'm FieldShift AI 🌱\nI can help you understand climate trends, recommendations, and farming practices for your area. You can ask questions in Bangla or English.\n\nHere are some things you can ask:\n• Why is the recommended planting window 15 – 25 July?\n• What will happen if I plant earlier?\n• Which crop is better with less water?\n• How does rainfall affect Aman rice?\n• Tell me about crop rotation for my area.\n• Give me simple tips to save water.\n• Explain this result in simple Bangla.\n• Compare Aman rice and Boro rice.",
+      "Hello! I'm CropWise AI 🌱\nI can help you understand climate trends, recommendations, and farming practices for your area. You can ask questions in Bangla or English.\n\nHere are some things you can ask:\n• Why is the recommended planting window 15 – 25 July?\n• What will happen if I plant earlier?\n• Which crop is better with less water?\n• How does rainfall affect Aman rice?\n• Tell me about crop rotation for my area.\n• Give me simple tips to save water.\n• Explain this result in simple Bangla.\n• Compare Aman rice and Boro rice.",
   },
 ];
 
@@ -112,7 +112,7 @@ export default function AskAiPage() {
         <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
           <div className="max-w-md">
             <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
-              Ask FieldShift AI
+              Ask CropWise AI
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
               Get simple, practical answers to your farming questions using NASA data
@@ -190,7 +190,7 @@ export default function AskAiPage() {
               <Send className="h-4 w-4" />
             </button>
           </div>
-          <p className="pb-3 text-center text-[11px] text-slate-300">FieldShift AI may make mistakes. Please verify important decisions.</p>
+          <p className="pb-3 text-center text-[11px] text-slate-300">CropWise AI may make mistakes. Please verify important decisions.</p>
         </div>
 
         {/* Right rail */}

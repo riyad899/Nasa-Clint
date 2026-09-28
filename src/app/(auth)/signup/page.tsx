@@ -76,7 +76,7 @@ export default function SignUpPage() {
         </span>
         <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">Create Account</h2>
         <p className="mt-1.5 text-xs text-slate-500">
-          Join FieldShift to get NASA-powered climate insights for your farm
+          Join CropWise AI to get NASA-powered climate insights for your farm
         </p>
       </div>
 
@@ -182,7 +182,7 @@ export default function SignUpPage() {
               onChange={(e) => setAgreedToTerms(e.target.checked)}
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary-700 focus:ring-primary-400"
             />
-            <span>I agree to FieldShift&apos;s Terms of Service and Privacy Policy.</span>
+            <span>I agree to CropWise AI&apos;s Terms of Service and Privacy Policy.</span>
           </label>
           {errors.terms && <p className="mt-1 text-[11px] text-rose-600">{errors.terms}</p>}
         </div>

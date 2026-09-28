@@ -7,7 +7,7 @@ export const DICTIONARY = {
     nav_climate_analysis: "Climate Analysis",
     nav_recommendations: "Recommendations",
     nav_why_this_result: "Why This Result?",
-    nav_ask_ai: "Ask FieldShift AI",
+    nav_ask_ai: "Ask CropWise AI",
     nav_learn: "Learn",
     nav_about: "About",
     tagline: "Adapting Farms with NASA Data",
@@ -36,7 +36,7 @@ export const DICTIONARY = {
     filter_select_location: "Select Location",
     filter_select_crop: "Select Crop",
     filter_select_priority: "Select Priority",
-    filter_hint_ai: "💡 Not sure? Ask FieldShift AI or explore our learning section!",
+    filter_hint_ai: "💡 Not sure? Ask CropWise AI or explore our learning section!",
     filter_hint_nasa: "ⓘ Your data is analyzed using NASA Earth observations.",
 
     // Metrics
@@ -62,7 +62,7 @@ export const DICTIONARY = {
     rec_primary_crop: "Primary Crop",
     rec_water: "Water",
     rec_risk: "Risk",
-    rec_based_on: "Based on NASA Earth observations and FieldShift AI models, the optimal planting window for",
+    rec_based_on: "Based on NASA Earth observations and CropWise AI models, the optimal planting window for",
     rec_in: "in",
     rec_is: "is identified as",
     rec_to: "to",
@@ -100,9 +100,9 @@ export const DICTIONARY = {
     empty_slogan: "Same Land. New Possibilities.",
 
     // Ask AI Bar
-    ask_ai_title: "Need help? Ask FieldShift AI",
+    ask_ai_title: "Need help? Ask CropWise AI",
     ask_ai_subtitle: "Get simple explanations, farming tips, or learn how it works in Bangla or English.",
-    ask_ai_placeholder: "Ask how FieldShift works...",
+    ask_ai_placeholder: "Ask how CropWise AI works...",
 
     // Map section
     map_title: "Farm Location & Satellite Coverage",
@@ -114,7 +114,7 @@ export const DICTIONARY = {
     nav_climate_analysis: "জলবায়ু বিশ্লেষণ",
     nav_recommendations: "সুপারিশসমূহ",
     nav_why_this_result: "কেন এই ফলাফল?",
-    nav_ask_ai: "ফিল্ডশিফট এআইকে জিজ্ঞাসা করুন",
+    nav_ask_ai: "ক্রপওয়াইজ এআইকে জিজ্ঞাসা করুন",
     nav_learn: "শিখুন",
     nav_about: "আমাদের সম্পর্কে",
     tagline: "নাসার তথ্যে আধুনিক কৃষি",
@@ -143,7 +143,7 @@ export const DICTIONARY = {
     filter_select_location: "অবস্থান নির্বাচন করুন",
     filter_select_crop: "ফসল নির্বাচন করুন",
     filter_select_priority: "অগ্রাধিকার নির্বাচন করুন",
-    filter_hint_ai: "💡 নিশ্চিত নন? ফিল্ডশিফট এআইকে জিজ্ঞাসা করুন বা আমাদের শিখন বিভাগটি দেখুন!",
+    filter_hint_ai: "💡 নিশ্চিত নন? ক্রপওয়াইজ এআইকে জিজ্ঞাসা করুন বা আমাদের শিখন বিভাগটি দেখুন!",
     filter_hint_nasa: "ⓘ আপনার তথ্য নাসার স্যাটেলাইট আর্থ অবজারভেশন দ্বারা বিশ্লেষিত।",
 
     // Metrics
@@ -169,7 +169,7 @@ export const DICTIONARY = {
     rec_primary_crop: "প্রধান ফসল",
     rec_water: "পানির চাহিদা",
     rec_risk: "ঝুঁকি",
-    rec_based_on: "নাসার স্যাটেলাইট পর্যবেক্ষণ ও ফিল্ডশিফট এআই মডেল অনুসারে,",
+    rec_based_on: "নাসার স্যাটেলাইট পর্যবেক্ষণ ও ক্রপওয়াইজ এআই মডেল অনুসারে,",
     rec_in: "-এ",
     rec_is: "ফসলের জন্য সর্বোত্তম রোপণ সময় নির্ধারণ করা হয়েছে",
     rec_to: "থেকে",
@@ -207,9 +207,9 @@ export const DICTIONARY = {
     empty_slogan: "একই জমি। নতুন সম্ভাবনা।",
 
     // Ask AI Bar
-    ask_ai_title: "সাহায্য প্রয়োজন? ফিল্ডশিফট এআইকে জিজ্ঞাসা করুন",
+    ask_ai_title: "সাহায্য প্রয়োজন? ক্রপওয়াইজ এআইকে জিজ্ঞাসা করুন",
     ask_ai_subtitle: "সহজ ব্যাখ্যা, কৃষি পরামর্শ বা সিস্টেমটি কীভাবে কাজ করে তা বাংলা বা ইংরেজিতে জানুন।",
-    ask_ai_placeholder: "ফিল্ডশিফট কীভাবে কাজ করে জিজ্ঞাসা করুন...",
+    ask_ai_placeholder: "ক্রপওয়াইজ এআই কীভাবে কাজ করে জিজ্ঞাসা করুন...",
 
     // Map section
     map_title: "খামারের অবস্থান ও স্যাটেলাইট কভারেজ",

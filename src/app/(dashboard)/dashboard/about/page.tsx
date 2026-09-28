@@ -57,14 +57,14 @@ export default function AboutPage() {
         {/* Text content */}
         <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
           <div className="max-w-md">
-            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">About FieldShift</h1>
+            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">About CropWise AI</h1>
 
             <p className="mt-1 text-lg font-medium text-slate-800">
               Adapting Farms with NASA Data
             </p>
 
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              FieldShift uses NASA Earth observations and AI analysis to help farmers
+              CropWise AI uses NASA Earth observations and AI analysis to help farmers
               make informed, climate-resilient decisions.
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function AboutPage() {
       </section>
 
       <section className="rounded-2xl border border-slate-100 bg-white p-5">
-        <h2 className="text-base font-semibold text-slate-900">How FieldShift Works</h2>
+        <h2 className="text-base font-semibold text-slate-900">How CropWise AI Works</h2>
         <div className="mt-5 flex items-start justify-between gap-2 overflow-x-auto">
           {steps.map((s, i) => (
             <React.Fragment key={s.title}>
@@ -185,7 +185,7 @@ export default function AboutPage() {
         </button>
       </section>
 
-      <AskAiBar title="Ask FieldShift AI" subtitle="Ask anything about our project, data sources, or how it works." placeholder="e.g. How does FieldShift use NASA data?" />
+      <AskAiBar title="Ask CropWise AI" subtitle="Ask anything about our project, data sources, or how it works." placeholder="e.g. How does CropWise AI use NASA data?" />
       </div>
     </div>
   );

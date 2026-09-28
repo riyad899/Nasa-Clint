@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Caveat } from "next/font/google";
 import {
   Lightbulb,
@@ -17,11 +18,22 @@ import {
   Calendar,
   Quote,
   ArrowRight,
+  AlertCircle,
+  CheckCircle2,
+  Database,
+  Download,
+  Loader2,
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 import { MiniBarChart, MiniLineChart, ChartLegend } from "@/Components/modules/Dashboord/MiniCharts";
+import {
+  getAnalysisObservations,
+  getAnalysisTransparency,
+  ObservationsResponse,
+  TransparencyResponse,
+} from "@/lib/apis/analyzeAi";
 
 // Handwritten font — same one used across the app for consistency
 const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
@@ -66,9 +78,80 @@ const steps = [
 ];
 
 export default function WhyThisResultPage() {
+  const searchParams = useSearchParams();
   const [location, setLocation] = useState("Rajshahi");
   const [crop, setCrop] = useState("Aman Rice");
   const [priority, setPriority] = useState("Save Water");
+  const [analysisId, setAnalysisId] = useState("");
+  const [transparency, setTransparency] = useState<TransparencyResponse["data"]>(null);
+  const [observations, setObservations] = useState<ObservationsResponse["data"]>(null);
+  const [observationPage, setObservationPage] = useState(1);
+  const [transparencyLoading, setTransparencyLoading] = useState(false);
+  const [transparencyError, setTransparencyError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const requestedId = searchParams.get("analysisId");
+    const storedId = window.localStorage.getItem("fieldshift:last-analysis-id");
+    const nextAnalysisId = requestedId || storedId || "";
+    setAnalysisId(nextAnalysisId);
+
+    if (!nextAnalysisId) return;
+
+    let cancelled = false;
+    setTransparencyLoading(true);
+    setTransparencyError(null);
+
+    Promise.all([
+      getAnalysisTransparency(nextAnalysisId),
+      getAnalysisObservations(nextAnalysisId),
+    ])
+      .then(([analysisResponse, observationsResponse]) => {
+        if (cancelled) return;
+        if (!analysisResponse.success || !analysisResponse.data) {
+          setTransparencyError(analysisResponse.error || analysisResponse.message || "Analysis not found");
+          setTransparency(null);
+          setObservations(null);
+          return;
+        }
+        setTransparency(analysisResponse.data);
+        setObservations(observationsResponse.data);
+        setLocation(analysisResponse.data.location.district);
+        setCrop("Aman Rice");
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setTransparencyError(error instanceof Error ? error.message : "Unable to load analysis transparency");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setTransparencyLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!analysisId || observationPage === 1) return;
+    getAnalysisObservations(analysisId, observationPage)
+      .then((response) => {
+        if (response.success && response.data) setObservations(response.data);
+      })
+      .catch(() => {
+        setTransparencyError("Unable to load this observation page");
+      });
+  }, [analysisId, observationPage]);
+
+  const openObservationsCsv = () => {
+    if (!analysisId) return;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5007";
+    window.open(
+      `${apiUrl.replace(/\/$/, "")}/api/v1/analyses/${encodeURIComponent(analysisId)}/observations.csv?source=POWER&variable=PRECTOTCORR`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   return (
     <div className="pb-8">
@@ -223,8 +306,85 @@ export default function WhyThisResultPage() {
         </div>
       </section>
 
+      {/* ================= TRANSPARENCY ================= */}
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">Analysis transparency</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-900">See exactly how this result was produced</h2>
+            <p className="mt-1 text-sm text-slate-500">Method, source data, calculations, explanation, and audit history for this analysis.</p>
+          </div>
+          {transparency && (
+            <button onClick={openObservationsCsv} className="flex items-center gap-2 rounded-lg border border-primary-200 bg-white px-3 py-2 text-xs font-semibold text-primary-800 shadow-sm hover:bg-primary-50">
+              <Download className="h-4 w-4" /> Download observations CSV
+            </button>
+          )}
+        </div>
+
+        {transparencyLoading && (
+          <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-white p-5 text-sm text-slate-600 shadow-sm">
+            <Loader2 className="h-4 w-4 animate-spin text-primary-700" /> Loading analysis transparency...
+          </div>
+        )}
+
+        {!transparencyLoading && !analysisId && (
+          <div className="rounded-2xl border border-sky-100 bg-sky-50 p-5 text-sm leading-relaxed text-sky-900">
+            Run an analysis from the Climate Analysis page first. Its analysis ID will appear here automatically. You can also open this page with <code className="rounded bg-white px-1.5 py-0.5 text-xs">?analysisId=...</code>.
+          </div>
+        )}
+
+        {!transparencyLoading && transparencyError && (
+          <div className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-800">
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-600" />
+            <div><p className="font-semibold">Unable to load transparency</p><p className="mt-1">{transparencyError}</p><p className="mt-2 text-xs">Analysis ID: {analysisId}</p></div>
+          </div>
+        )}
+
+        {transparency && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><p className="text-xs text-slate-500">Analysis ID</p><p className="mt-2 break-all font-mono text-sm font-semibold text-slate-800">{transparency.id}</p><p className="mt-2 text-xs text-slate-500">Algorithm: {transparency.algorithmVersion}</p></div>
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><p className="text-xs text-slate-500">Status</p><p className="mt-2 flex items-center gap-2 text-lg font-semibold capitalize text-emerald-700"><CheckCircle2 className="h-5 w-5" /> {transparency.status}</p><p className="mt-2 text-xs text-slate-500">Completed {new Date(transparency.completedAt).toLocaleString()}</p></div>
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><p className="text-xs text-slate-500">Location</p><p className="mt-2 text-lg font-semibold text-slate-800">{transparency.location.district}</p><p className="mt-2 text-xs text-slate-500">{transparency.location.latitude}, {transparency.location.longitude}</p></div>
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><p className="text-xs text-slate-500">Crop and method</p><p className="mt-2 text-lg font-semibold text-slate-800">Aman rice</p><p className="mt-2 text-xs text-slate-500">{transparency.crop.farmingMethod}</p></div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="rounded-2xl border border-primary-100 bg-primary-50 p-6">
+                <h3 className="flex items-center gap-2 text-base font-semibold text-primary-900"><Lightbulb className="h-5 w-5" /> AI explanation</h3>
+                <p className="mt-4 text-sm leading-7 text-slate-700">{transparency.aiExplanation.explanation}</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-white px-3 py-1 text-slate-700">Source: {transparency.aiExplanation.source}</span><span className="rounded-full bg-white px-3 py-1 text-slate-700">Fallback: {transparency.aiExplanation.fallback ? "Yes" : "No"}</span></div>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900"><Cog className="h-5 w-5 text-primary-700" /> Methodology</h3>
+                <p className="mt-4 text-sm leading-6 text-slate-700">{transparency.methodology.rule}</p>
+                <dl className="mt-4 grid grid-cols-1 gap-3 text-xs sm:grid-cols-2"><div><dt className="text-slate-500">Shift formula</dt><dd className="mt-1 font-mono text-slate-800">{transparency.methodology.formulas.shift}</dd></div><div><dt className="text-slate-500">Percentiles</dt><dd className="mt-1 font-mono text-slate-800">{transparency.methodology.formulas.percentiles}</dd></div><div><dt className="text-slate-500">Baseline period</dt><dd className="mt-1 font-medium text-slate-800">{transparency.baselinePeriod.startYear}-{transparency.baselinePeriod.endYear}</dd></div><div><dt className="text-slate-500">Recent period</dt><dd className="mt-1 font-medium text-slate-800">{transparency.recentPeriod.startYear}-{transparency.recentPeriod.endYear}</dd></div></dl>
+                <p className="mt-4 text-xs text-slate-500">Uncertainty: {transparency.methodology.uncertaintyMethod}</p>
+              </div>
+            </div>
+
+            {transparency.sources.map((source) => (
+              <div key={source.id} className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="flex items-center gap-2 text-base font-semibold text-slate-900"><Database className="h-5 w-5 text-primary-700" /> {source.provider} {source.source}</h3><p className="mt-1 text-xs text-slate-500">{source.dataset} · {source.sourceVersion} · {source.fetchStatus}</p></div><a href={source.sourceLink} target="_blank" rel="noreferrer" className="text-xs font-semibold text-primary-700 hover:underline">Open source</a></div>
+                <div className="mt-4 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4"><div><p className="text-slate-500">Variable</p><p className="mt-1 font-medium text-slate-800">{source.variables.join(", ")}</p></div><div><p className="text-slate-500">Units</p><p className="mt-1 font-medium text-slate-800">{Object.values(source.units).join(", ")}</p></div><div><p className="text-slate-500">Records</p><p className="mt-1 font-medium text-slate-800">{source.recordCount}</p></div><div><p className="text-slate-500">Requested range</p><p className="mt-1 font-medium text-slate-800">{source.requestedStart} to {source.requestedEnd}</p></div></div>
+                <details className="mt-4 rounded-xl bg-slate-50 p-3 text-xs"><summary className="cursor-pointer font-semibold text-slate-700">View request parameters and endpoint</summary><p className="mt-2 break-all font-mono text-slate-600">{source.endpoint}</p><pre className="mt-2 overflow-x-auto text-slate-600">{JSON.stringify(source.requestParameters, null, 2)}</pre></details>
+              </div>
+            ))}
+
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3"><h3 className="text-base font-semibold text-slate-900">Yearly calculations</h3><span className="text-xs text-slate-500">{transparency.yearlyCalculations.length} records returned</span></div>
+              <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-xs"><thead className="bg-slate-50 text-slate-500"><tr><th className="px-3 py-2 font-medium">Period</th><th className="px-3 py-2 font-medium">Year</th><th className="px-3 py-2 font-medium">Onset</th><th className="px-3 py-2 font-medium">Day</th><th className="px-3 py-2 font-medium">Rainfall</th><th className="px-3 py-2 font-medium">Quality</th></tr></thead><tbody>{transparency.yearlyCalculations.map((row) => <tr key={row.id} className="border-t border-slate-100"><td className="px-3 py-2 capitalize text-slate-600">{row.periodType}</td><td className="px-3 py-2 font-semibold text-slate-800">{row.year}</td><td className="px-3 py-2 text-slate-600">{row.onsetDate}</td><td className="px-3 py-2 text-slate-600">{row.dayOfYear}</td><td className="px-3 py-2 text-slate-600">{row.rainfallTotal} mm</td><td className="px-3 py-2"><span className={row.valid ? "text-emerald-700" : "text-rose-700"}>{row.valid ? "Valid" : "Invalid"} · {row.confidence}</span></td></tr>)}</tbody></table></div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3"><h3 className="text-base font-semibold text-slate-900">Raw observations</h3><span className="text-xs text-slate-500">{observations?.pagination.total ?? 0} total · page {observations?.pagination.page ?? 1} of {observations?.pagination.totalPages ?? 1}</span></div><div className="mt-4 overflow-x-auto"><table className="w-full text-left text-xs"><thead className="bg-slate-50 text-slate-500"><tr><th className="px-3 py-2 font-medium">Observed</th><th className="px-3 py-2 font-medium">Variable</th><th className="px-3 py-2 font-medium">Value</th><th className="px-3 py-2 font-medium">Quality</th></tr></thead><tbody>{observations?.items.map((item) => <tr key={item.id} className="border-t border-slate-100"><td className="px-3 py-2 text-slate-600">{new Date(item.observedAt).toLocaleDateString()}</td><td className="px-3 py-2 font-mono text-slate-700">{item.variable}</td><td className="px-3 py-2 text-slate-700">{item.value} {item.unit}</td><td className="px-3 py-2 text-emerald-700">{item.isValid ? "Valid" : item.qualityNote || "Invalid"}</td></tr>)}</tbody></table></div><div className="mt-4 flex items-center justify-end gap-2"><button disabled={(observations?.pagination.page ?? 1) <= 1} onClick={() => setObservationPage((page) => Math.max(1, page - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 disabled:cursor-not-allowed disabled:opacity-40">Previous</button><button disabled={(observations?.pagination.page ?? 1) >= (observations?.pagination.totalPages ?? 1)} onClick={() => setObservationPage((page) => page + 1)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 disabled:cursor-not-allowed disabled:opacity-40">Next</button></div></div>
+
+            {transparency.warnings.length > 0 && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"><p className="font-semibold">Warnings</p><ul className="mt-2 list-disc space-y-1 pl-5">{transparency.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>}
+          </div>
+        )}
+      </section>
+
       <AskAiBar
-        title="Still have questions? Ask FieldShift AI"
+        title="Still have questions? Ask CropWise AI"
         subtitle="Get simple explanations in Bangla or English. Learn more about the data or ask anything about your farm."
         placeholder="e.g. Why is rainfall delayed this year in Rajshahi?"
       />

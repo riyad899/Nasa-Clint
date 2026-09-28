@@ -30,7 +30,7 @@ import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 import {
   analyzeClimateData,
   AnalyzeRequest,
-  AnalysisData,
+  OnsetAnalysisData,
 } from "@/lib/apis/analyzeAi";
 import { useLanguage } from "@/lib/language-context";
 import { MONTH_NAMES } from "@/lib/translations/dictionaries";
@@ -83,109 +83,26 @@ function formatPlantingDate(dateStr: string, isBn = false): string {
   }
 }
 
-function buildAnalyzeRequest(loc: string, crp: string, pri: string): AnalyzeRequest {
+function buildAnalyzeRequest(loc: string, crp: string): AnalyzeRequest {
   const coords = LOCATION_COORDINATES[loc] || { latitude: 24.35, longitude: 90.42 };
 
-  let currentCrop = "rice";
-  let consideringCrops = ["rice", "maize", "mustard"];
-  const lowerCrop = crp.toLowerCase();
-
-  if (lowerCrop.includes("maize")) {
-    currentCrop = "maize";
-    consideringCrops = ["maize", "mustard", "wheat"];
-  } else if (lowerCrop.includes("mustard")) {
-    currentCrop = "mustard";
-    consideringCrops = ["mustard", "wheat", "maize"];
-  } else if (lowerCrop.includes("wheat")) {
-    currentCrop = "wheat";
-    consideringCrops = ["wheat", "maize", "mustard"];
-  } else if (lowerCrop.includes("potato")) {
-    currentCrop = "potato";
-    consideringCrops = ["potato", "maize", "mustard"];
-  } else if (lowerCrop.includes("jute")) {
-    currentCrop = "jute";
-    consideringCrops = ["jute", "rice", "maize"];
-  } else if (lowerCrop.includes("lentil") || lowerCrop.includes("pulse")) {
-    currentCrop = "lentil";
-    consideringCrops = ["lentil", "mustard", "wheat"];
-  } else if (lowerCrop.includes("sugarcane")) {
-    currentCrop = "sugarcane";
-    consideringCrops = ["sugarcane", "maize", "mustard"];
-  } else if (lowerCrop.includes("onion")) {
-    currentCrop = "onion";
-    consideringCrops = ["onion", "potato", "mustard"];
-  } else if (lowerCrop.includes("chili") || lowerCrop.includes("spice")) {
-    currentCrop = "chili";
-    consideringCrops = ["chili", "mustard", "onion"];
-  } else if (lowerCrop.includes("vegetable")) {
-    currentCrop = "vegetables";
-    consideringCrops = ["vegetables", "potato", "maize"];
-  } else if (
-    lowerCrop.includes("boro") ||
-    lowerCrop.includes("aman") ||
-    lowerCrop.includes("aus") ||
-    lowerCrop.includes("rice")
-  ) {
-    currentCrop = "rice";
-    consideringCrops = ["rice", "maize", "mustard"];
-  } else {
-    currentCrop = lowerCrop.split(" ")[0] || "rice";
-    consideringCrops = [currentCrop, "maize", "mustard"];
-  }
-
-  let waterAvailability = "low";
-  let riskTolerance = "low";
-  let priorityCode = "water_saving";
-
-  if (pri === "Maximize Yield") {
-    waterAvailability = "moderate";
-    riskTolerance = "moderate";
-    priorityCode = "maximize_yield";
-  } else if (pri === "Climate Resilience") {
-    waterAvailability = "moderate";
-    riskTolerance = "high";
-    priorityCode = "climate_resilience";
-  } else if (pri.includes("Low Risk") || pri.includes("Cost")) {
-    waterAvailability = "low";
-    riskTolerance = "low";
-    priorityCode = "cost_minimization";
-  } else if (pri.includes("Fast Harvest") || pri.includes("Early")) {
-    waterAvailability = "moderate";
-    riskTolerance = "moderate";
-    priorityCode = "short_duration";
-  } else if (pri.includes("Soil Health")) {
-    waterAvailability = "moderate";
-    riskTolerance = "low";
-    priorityCode = "soil_health";
-  } else if (pri.includes("Pest") || pri.includes("Disease")) {
-    waterAvailability = "moderate";
-    riskTolerance = "high";
-    priorityCode = "pest_resistance";
-  } else if (pri.includes("Profit") || pri.includes("Market")) {
-    waterAvailability = "moderate";
-    riskTolerance = "moderate";
-    priorityCode = "high_profit";
-  }
-
   return {
-    location: coords,
-    analysisPeriod: {
-      startDate: "2024-06-01",
-      endDate: "2024-06-03",
+    location: {
+      ...coords,
+      district: loc,
     },
     crop: {
-      currentCrop,
-      consideringCrops,
+      cropType: "aman_rice",
+      farmingMethod: "rainfed",
     },
-    farmerPriority: {
-      waterAvailability,
-      riskTolerance,
-      priority: priorityCode,
+    analysis: {
+      type: "usable_rain_onset_shift",
+      baselineStartYear: 2001,
+      baselineEndYear: 2010,
+      recentStartYear: 2016,
+      recentEndYear: 2025,
     },
-    soil: {
-      type: "loam",
-      ph: 6.5,
-    },
+    language: "bn",
   };
 }
 
@@ -357,7 +274,7 @@ function ClimateAnalysisContent() {
   const [hasResult, setHasResult] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+  const [analysisData, setAnalysisData] = useState<OnsetAnalysisData | null>(null);
 
   const executeAnalysis = async (targetLoc: string, targetCrop: string, targetPri: string) => {
     if (!targetLoc || !targetCrop || !targetPri) return;
@@ -366,12 +283,13 @@ function ClimateAnalysisContent() {
     setError(null);
 
     try {
-      const payload = buildAnalyzeRequest(targetLoc, targetCrop, targetPri);
+      const payload = buildAnalyzeRequest(targetLoc, targetCrop);
       const res = await analyzeClimateData(payload);
 
       if (res && res.success && res.data) {
         setAnalysisData(res.data);
         setHasResult(true);
+        window.localStorage.setItem("fieldshift:last-analysis-id", res.data.analysisId);
       } else {
         setError(res?.message || "Failed to analyze climate data. Please try again.");
       }
@@ -404,111 +322,8 @@ function ClimateAnalysisContent() {
   };
 
   const isBn = lang === "BN";
-
-  // Derive dynamic metrics from API data if available, otherwise fallback
-  const dynamicMetrics = analysisData
-    ? [
-        {
-          label: t("metric_rainfall"),
-          value: `${analysisData.climateSummary.rainfall.recent} mm`,
-          note: `${t("metric_rainfall_note")}: ${termName(analysisData.climateSummary.rainfall.trend)}`,
-          desc: translateDynamicSync(
-            analysisData.whyThisResult.find((f) => f.factor.toLowerCase().includes("rain"))?.observation ||
-              "Recent observed and projected precipitation for the analyzed window."
-          ),
-          icon: CloudRain,
-          card: "bg-sky-50 border-sky-100",
-          iconBg: "bg-white text-sky-600",
-          valueColor: "text-sky-900",
-        },
-        {
-          label: t("metric_temperature"),
-          value: `${analysisData.climateSummary.temperature.mean}°C`,
-          note: `${t("metric_temperature_note")}: ${analysisData.climateSummary.temperature.max}°C`,
-          desc: translateDynamicSync(
-            analysisData.whyThisResult.find((f) => f.factor.toLowerCase().includes("temp"))?.observation ||
-              "Mean ambient temperature across the target crop vegetative phase."
-          ),
-          icon: Thermometer,
-          card: "bg-rose-50 border-rose-100",
-          iconBg: "bg-white text-rose-600",
-          valueColor: "text-rose-600",
-        },
-        {
-          label: t("metric_moisture"),
-          value: `${analysisData.climateSummary.soilMoisture.rootzone} m³/m³`,
-          note: `${t("metric_rainfall_note")}: ${termName(analysisData.climateSummary.soilMoisture.trend)}`,
-          desc: `${t("metric_moisture_surface")}: ${analysisData.climateSummary.soilMoisture.surface} m³/m³. ${translateDynamicSync(
-            analysisData.whyThisResult.find((f) => f.factor.toLowerCase().includes("soil"))?.impact || ""
-          )}`,
-          icon: Droplet,
-          card: "bg-violet-50 border-violet-100",
-          iconBg: "bg-white text-violet-600",
-          valueColor: "text-violet-700",
-        },
-        {
-          label: t("metric_risk"),
-          value: termName(analysisData.recommendation.riskLevel).toUpperCase(),
-          note: `${t("metric_water_req")}: ${termName(analysisData.recommendation.waterRequirement)}`,
-          desc: translateDynamicSync(
-            analysisData.risks[0]?.reason ||
-              "Soil reserve and thermal trends support healthy initial emergence."
-          ),
-          icon: Leaf,
-          card: "bg-emerald-50 border-emerald-100",
-          iconBg: "bg-white text-emerald-600",
-          valueColor: "text-emerald-700",
-        },
-      ]
-    : [
-        {
-          label: isBn ? "বৃষ্টিপাতের সূচনা" : "Rainfall Onset",
-          value: isBn ? "+১১ দিন" : "+11 days",
-          note: isBn ? "২০০১–২০১২ এর তুলনায়" : "Compared to 2001–2012",
-          desc: isBn ? "সাম্প্রতিক বছরগুলোতে বর্ষা মৌসুম দেরিতে শুরু হচ্ছে।" : "Rainy season now starts later in recent years.",
-          icon: CloudRain,
-          card: "bg-sky-50 border-sky-100",
-          iconBg: "bg-white text-sky-600",
-          valueColor: "text-sky-900",
-        },
-        {
-          label: isBn ? "তাপমাত্রা বৃদ্ধি" : "Temperature",
-          value: "+0.8°C",
-          note: isBn ? "ফসল বৃদ্ধির মৌসুমে" : "During growing season",
-          desc: isBn ? "উচ্চ তাপমাত্রা ফসলের বৃদ্ধি ও উৎপাদনে প্রভাব ফেলতে পারে।" : "Higher temperatures may affect crop development.",
-          icon: Thermometer,
-          card: "bg-rose-50 border-rose-100",
-          iconBg: "bg-white text-rose-600",
-          valueColor: "text-rose-600",
-        },
-        {
-          label: isBn ? "মাটির আর্দ্রতা" : "Soil Moisture",
-          value: isBn ? "মাঝারি" : "Moderate",
-          note: isBn ? "বর্তমান অবস্থা" : "Current condition",
-          desc: isBn ? "শিগগিরই চারা রোপণের জন্য মাটির আর্দ্রতা যথেষ্ট।" : "Soil moisture is sufficient for transplanting soon.",
-          icon: Droplet,
-          card: "bg-violet-50 border-violet-100",
-          iconBg: "bg-white text-violet-600",
-          valueColor: "text-violet-700",
-        },
-        {
-          label: isBn ? "উদ্ভিদের স্বাস্থ্য সূচক (NDVI)" : "Vegetation Index (NDVI)",
-          value: isBn ? "স্থিতিশীল" : "Stable",
-          note: isBn ? "সাম্প্রতিক ধারা" : "Recent trend",
-          desc: isBn ? "মৌসুমের এই সময়ে উদ্ভিদের বৃদ্ধি সন্তোষজনক।" : "Vegetation condition looks healthy for the season.",
-          icon: Leaf,
-          card: "bg-emerald-50 border-emerald-100",
-          iconBg: "bg-white text-emerald-600",
-          valueColor: "text-emerald-700",
-        },
-      ];
-
-  const startDateFormatted = analysisData
-    ? formatPlantingDate(analysisData.recommendation.plantingWindow.start, isBn)
-    : isBn ? "১৫ জুলাই" : "15 JULY";
-  const endDateFormatted = analysisData
-    ? formatPlantingDate(analysisData.recommendation.plantingWindow.end, isBn)
-    : isBn ? "২৫ জুলাই" : "25 JULY";
+  const startDateFormatted = analysisData ? formatPlantingDate(analysisData.transplantingWindow.start, isBn) : "";
+  const endDateFormatted = analysisData ? formatPlantingDate(analysisData.transplantingWindow.end, isBn) : "";
 
   const onboardingSteps = [
     { n: 1, title: t("step1_title"), desc: t("step1_desc"), icon: MapPin },
@@ -640,44 +455,48 @@ function ClimateAnalysisContent() {
       {/* ── RESULTS ──────────────────────────────────────────────────────────── */}
       {hasResult && !isLoading ? (
         <div className="space-y-8">
-          {/* Metric cards */}
-          <section className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 ${SECTION_X}`}>
-            {dynamicMetrics.map((m) => (
-              <div key={m.label} className={`rounded-2xl border p-5 shadow-sm transition hover:shadow-md ${m.card}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-xl shadow-sm ${m.iconBg}`}>
-                    <m.icon className="h-4 w-4" />
-                  </span>
-                  <span className="text-xs font-medium text-slate-500">{m.label}</span>
+          {/* Onset summary */}
+          {analysisData && (
+            <section className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 ${SECTION_X}`}>
+              {[
+                { label: isBn ? "মধ্যম onset পরিবর্তন" : "Median onset shift", value: `${analysisData.shift.medianDays > 0 ? "+" : ""}${analysisData.shift.medianDays} days`, icon: CloudRain, tone: "bg-sky-50 border-sky-100 text-sky-800" },
+                { label: isBn ? "পুরনো সময়ের median" : "Baseline median", value: `Day ${analysisData.baseline.medianDayOfYear}`, icon: Calendar, tone: "bg-slate-50 border-slate-200 text-slate-800" },
+                { label: isBn ? "সাম্প্রতিক সময়ের median" : "Recent median", value: `Day ${analysisData.recent.medianDayOfYear}`, icon: BarChart3, tone: "bg-emerald-50 border-emerald-100 text-emerald-800" },
+                { label: isBn ? "প্রস্তাবিত transplanting window" : "Transplanting window", value: `${startDateFormatted} - ${endDateFormatted}`, icon: Sprout, tone: "bg-amber-50 border-amber-100 text-amber-800" },
+              ].map((metric) => (
+                <div key={metric.label} className={`rounded-2xl border p-5 shadow-sm ${metric.tone}`}>
+                  <div className="flex items-center gap-2 text-xs font-semibold">
+                    <metric.icon className="h-4 w-4" /> {metric.label}
+                  </div>
+                  <p className="mt-3 text-2xl font-bold">{metric.value}</p>
+                  <p className="mt-2 text-xs leading-relaxed opacity-75">
+                    {metric.label.includes("shift") || metric.label.includes("পরিবর্তন") ? analysisData.shift.direction : analysisData.shift.p25ToP75Days ? `${analysisData.shift.p25ToP75Days.lower} to ${analysisData.shift.p25ToP75Days.upper} days range` : ""}
+                  </p>
                 </div>
-                <p className={`mt-3 text-2xl font-semibold ${m.valueColor}`}>{m.value}</p>
-                <p className="mt-1 flex items-center gap-1 text-[11px] text-slate-400">
-                  {m.note} <Info className="h-3 w-3" />
-                </p>
-                <p className="mt-2 text-xs leading-relaxed text-slate-500">{m.desc}</p>
-              </div>
-            ))}
-          </section>
+              ))}
+            </section>
+          )}
 
-          {/* Charts */}
-          <section className={`grid grid-cols-1 gap-4 lg:grid-cols-2 ${SECTION_X}`}>
-            <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">{t("chart_rainfall_title")}</h2>
-                <Info className="h-4 w-4 text-slate-300" />
-              </div>
-              <ChartLegend />
-              <RainfallChart />
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">{t("chart_temp_title")}</h2>
-                <Info className="h-4 w-4 text-slate-300" />
-              </div>
-              <ChartLegend />
-              <TemperatureChart />
-            </div>
-          </section>
+          {/* Annual onset records */}
+          {analysisData && (
+            <section className={`grid grid-cols-1 gap-4 lg:grid-cols-2 ${SECTION_X}`}>
+              {[{ title: isBn ? "Baseline onset records" : "Baseline onset records", period: analysisData.baseline }, { title: isBn ? "Recent onset records" : "Recent onset records", period: analysisData.recent }].map(({ title, period }) => (
+                <div key={title} className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                    <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+                    <span className="text-xs text-slate-500">{period.startYear}-{period.endYear} · {period.validYears} valid years</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 text-slate-500"><tr><th className="px-5 py-3 font-medium">Year</th><th className="px-5 py-3 font-medium">Onset</th><th className="px-5 py-3 font-medium">Rainfall</th><th className="px-5 py-3 font-medium">Confidence</th></tr></thead>
+                      <tbody>{period.annualOnsets.map((onset) => <tr key={onset.year} className="border-t border-slate-100"><td className="px-5 py-3 font-semibold text-slate-700">{onset.year}</td><td className="px-5 py-3 text-slate-600">{formatPlantingDate(onset.onsetDate, isBn)}</td><td className="px-5 py-3 text-slate-600">{onset.rainfallTotalMm} mm</td><td className="px-5 py-3"><span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700">{onset.confidence}</span></td></tr>)}</tbody>
+                    </table>
+                  </div>
+                  <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">P25: day {period.p25DayOfYear} · Median: day {period.medianDayOfYear} · P75: day {period.p75DayOfYear}</p>
+                </div>
+              ))}
+            </section>
+          )}
 
           {/* Location Map */}
           {analysisData?.location && (
@@ -692,7 +511,7 @@ function ClimateAnalysisContent() {
           )}
 
           {/* Recommendation banner */}
-          <section className={SECTION_X}>
+          {analysisData && <section className={SECTION_X}>
             <div className="grid grid-cols-1 overflow-hidden rounded-2xl bg-primary-50 shadow-sm lg:grid-cols-2">
               <div className="p-6 sm:p-8 lg:p-10">
                 <p className="flex items-center gap-2 text-sm font-semibold text-primary-700">
@@ -703,68 +522,39 @@ function ClimateAnalysisContent() {
                 </h3>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1 rounded-full bg-clay-100 px-3 py-1 text-xs font-semibold text-clay-600">
-                    {t("rec_primary_crop")}: {cropName(analysisData?.recommendation.primaryCrop || crop || "Rice")}
+                    {t("rec_primary_crop")}: {cropName(analysisData.crop.cropType)}
                   </span>
-                  {analysisData?.recommendation.waterRequirement && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
-                      {t("rec_water")}: {termName(analysisData.recommendation.waterRequirement)}
-                    </span>
-                  )}
-                  {analysisData?.recommendation.riskLevel && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                      {t("rec_risk")}: {termName(analysisData.recommendation.riskLevel)}
-                    </span>
-                  )}
+                  <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                    {isBn ? "বিশ্বাসযোগ্যতা" : "Confidence"}: {analysisData.transplantingWindow.confidence}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                    {isBn ? "ধারা" : "Direction"}: {analysisData.shift.direction}
+                  </span>
                 </div>
 
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">
                   {isBn ? (
                     <>
-                      নাসার স্যাটেলাইট পর্যবেক্ষণ ও ফিল্ডশিফট এআই মডেল অনুসারে,{" "}
+                      নাসার স্যাটেলাইট পর্যবেক্ষণ ও ক্রপওয়াইজ এআই মডেল অনুসারে,{" "}
                       <strong className="text-slate-800">{locName(location) || "আপনার এলাকা"}</strong>-এ{" "}
-                      <strong className="text-slate-800">{cropName(analysisData?.recommendation.primaryCrop || crop)}</strong>{" "}
-                      চাষের উপযোগী রোপণ সময় নির্ধারণ করা হয়েছে {startDateFormatted} থেকে {endDateFormatted}। এতে পানির প্রয়োজনীয়তা{" "}
-                      <strong className="text-slate-800">{termName(analysisData?.recommendation.waterRequirement || "কম")}</strong>{" "}
-                      এবং ঝুঁকির মাত্রা <strong className="text-slate-800">{termName(analysisData?.recommendation.riskLevel || "মাঝারি")}</strong>।
-                      {analysisData?.recommendation.alternativeCrops?.length ? (
-                        <span> অন্যান্য উপযোগী বিকল্প ফসল: <strong className="text-slate-800">{analysisData.recommendation.alternativeCrops.map(c => cropName(c)).join(", ")}</strong>।</span>
-                      ) : null}
+                      <strong className="text-slate-800">{cropName(analysisData.crop.cropType)}</strong>{" "}
+                      চাষের জন্য {startDateFormatted} থেকে {endDateFormatted} window ব্যবহার করুন। {analysisData.explanation}
                     </>
                   ) : (
                     <>
-                      Based on NASA Earth observations and FieldShift AI models, the optimal planting
-                      window for{" "}
-                      <strong className="text-slate-800">{analysisData?.recommendation.primaryCrop || crop || "your crop"}</strong>{" "}
-                      in <strong className="text-slate-800">{location || "your area"}</strong> is identified
-                      as {startDateFormatted} to {endDateFormatted}.
-                      {analysisData?.recommendation.alternativeCrops?.length ? (
-                        <span> Viable alternatives include: <strong className="text-slate-800">{analysisData.recommendation.alternativeCrops.join(", ")}</strong>.</span>
-                      ) : null}
+                      {analysisData.explanation} The transplanting window for {analysisData.crop.cropType} in {analysisData.location.district} is {startDateFormatted} to {endDateFormatted}.
                     </>
                   )}
                 </p>
 
-                {/* Why this result list */}
-                {analysisData?.whyThisResult && analysisData.whyThisResult.length > 0 && (
-                  <div className="mt-5 space-y-2 border-t border-primary-200/60 pt-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-primary-900">
-                      {t("rec_why_title")}
-                    </p>
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                      {analysisData.whyThisResult.map((item, idx) => (
-                        <div key={idx} className="rounded-xl bg-white/80 p-3 shadow-xs">
-                          <p className="text-xs font-semibold text-primary-800">{termName(item.factor)}</p>
-                          <p className="mt-1 text-[11px] leading-tight text-slate-600">
-                            {translateDynamicSync(item.observation)}
-                          </p>
-                          <p className="mt-1 text-[10px] italic text-slate-500">
-                            {translateDynamicSync(item.impact)}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
+                <div className="mt-5 space-y-3 border-t border-primary-200/60 pt-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-primary-900">{isBn ? "কেন এই ফলাফল" : "Why this result"}</p>
+                  <p className="rounded-xl bg-white/80 p-4 text-sm leading-relaxed text-slate-700">{analysisData.explanation}</p>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <p className="rounded-xl bg-primary-50 p-3 text-xs leading-relaxed text-slate-700">{isBn ? "পরিসংখ্যানের পরিসর" : "Observed shift range"}: {analysisData.shift.p25ToP75Days.lower} to {analysisData.shift.p25ToP75Days.upper} days</p>
+                    <p className="rounded-xl bg-primary-50 p-3 text-xs leading-relaxed text-slate-700">{isBn ? "পদ্ধতি" : "Detection method"}: {analysisData.method.minimumAccumulatedRainfallMm} mm over {analysisData.method.accumulationDays} days; {analysisData.method.minimumConfirmationRainyDays} rainy days in {analysisData.method.confirmationWindowDays} days</p>
                   </div>
-                )}
+                </div>
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <button className="flex items-center gap-2 rounded-xl bg-primary-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-900">
@@ -792,65 +582,52 @@ function ClimateAnalysisContent() {
                     {t("quote_adapting")}
                   </p>
                   <div className="mt-3 h-px w-8 bg-white/40" />
-                  {analysisData?.generatedBy && (
-                    <p className="mt-2 text-[10px] text-white/70">
-                      {t("ai_powered")} {analysisData.generatedBy.model.split(":")[0]}
-                    </p>
-                  )}
+                  <p className="mt-2 text-[10px] text-white/70">{analysisData.crop.cropType} · {analysisData.location.district}</p>
                 </div>
               </div>
             </div>
-          </section>
+          </section>}
 
-          {/* Farmer Advice & Insights */}
-          {analysisData?.farmerAdvice && analysisData.farmerAdvice.length > 0 && (
+          {/* Farmer Guidance */}
+          {analysisData?.farmerGuidance && analysisData.farmerGuidance.length > 0 && (
             <section className={SECTION_X}>
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
-                <div className="flex items-center justify-between">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 shadow-sm sm:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600" /> {t("advice_title")}
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" /> {isBn ? "কৃষকের করণীয়" : "Farmer guidance"}
                   </h3>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                    {t("advice_badge")}
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-emerald-700 shadow-sm">
+                    {analysisData.farmerGuidance.length} {isBn ? "টি পরামর্শ" : "practical steps"}
                   </span>
                 </div>
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  {analysisData.farmerAdvice.map((advice, idx) => (
-                    <div key={idx} className="flex gap-3 rounded-xl bg-[#f8faf8] p-4 border border-slate-100">
-                      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-800 text-xs font-bold text-white">
-                        {idx + 1}
-                      </span>
-                      <p className="text-xs leading-relaxed text-slate-700">
-                        {translateDynamicSync(advice)}
-                      </p>
-                    </div>
+                <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {analysisData.farmerGuidance.map((advice, idx) => (
+                    <article key={idx} className="flex gap-4 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-700 text-sm font-bold text-white">{idx + 1}</span>
+                      <p className="text-sm leading-7 text-slate-700">{advice}</p>
+                    </article>
                   ))}
                 </div>
               </div>
             </section>
           )}
 
-          {/* Data Sources and Provenance */}
-          {analysisData?.dataSources && (
-            <section className={SECTION_X}>
-              <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200/60 bg-white px-5 py-3 text-xs text-slate-500 shadow-xs">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="flex items-center gap-1.5 font-medium text-slate-700">
-                    <Database className="h-3.5 w-3.5 text-primary-700" /> {t("data_sources")}
-                  </span>
-                  {analysisData.dataSources.map((src) => (
-                    <span key={src} className="rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
-                      {src}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Cpu className="h-3.5 w-3.5 text-slate-500" />
-                  <span>
-                    {t("ai_model")} {analysisData.generatedBy?.model || "FieldShift AI"} via {analysisData.generatedBy?.provider || "OpenRouter"}
-                  </span>
-                </div>
+          {/* Method, warnings, and data provenance */}
+          {analysisData && (
+            <section className={`grid grid-cols-1 gap-4 lg:grid-cols-2 ${SECTION_X}`}>
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900"><Database className="h-5 w-5 text-primary-700" /> {isBn ? "বিশ্লেষণের পদ্ধতি" : "Analysis method"}</h3>
+                <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                  <div><dt className="text-xs text-slate-500">Season</dt><dd className="font-medium text-slate-800">{analysisData.method.season}</dd></div>
+                  <div><dt className="text-xs text-slate-500">Crop / method</dt><dd className="font-medium text-slate-800">{analysisData.crop.cropType} / {analysisData.crop.farmingMethod}</dd></div>
+                  <div><dt className="text-xs text-slate-500">Minimum accumulated rainfall</dt><dd className="font-medium text-slate-800">{analysisData.method.minimumAccumulatedRainfallMm} mm</dd></div>
+                  <div><dt className="text-xs text-slate-500">Confirmation rule</dt><dd className="font-medium text-slate-800">{analysisData.method.minimumConfirmationRainyDays} rainy days / {analysisData.method.confirmationWindowDays} days</dd></div>
+                </dl>
+                <div className="mt-5 flex flex-wrap gap-2">{analysisData.dataSources.map((src) => <span key={src} className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">{src}</span>)}</div>
+              </div>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 shadow-sm">
+                <h3 className="flex items-center gap-2 text-base font-semibold text-amber-950"><Info className="h-5 w-5 text-amber-700" /> {isBn ? "সতর্কতা" : "Warnings"}</h3>
+                {analysisData.warnings.length > 0 ? <ul className="mt-4 space-y-3 text-sm leading-relaxed text-amber-900">{analysisData.warnings.map((warning) => <li key={warning} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-600" />{warning}</li>)}</ul> : <p className="mt-4 text-sm text-amber-900">{isBn ? "কোনো সতর্কতা নেই।" : "No warnings returned."}</p>}
               </div>
             </section>
           )}

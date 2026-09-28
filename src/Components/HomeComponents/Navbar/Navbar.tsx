@@ -45,11 +45,11 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-primary-100 bg-[#fbfaf7]/95 backdrop-blur">
       <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8">
 
-        {/* FieldShift Logo */}
+        {/* CropWise AI Logo */}
         <button
           onClick={handleHomeClick}
           className="flex items-center gap-2.5 text-left"
-          aria-label="Go to FieldShift home"
+          aria-label="Go to CropWise AI home"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-700 text-white">
             <Leaf className="h-4.5 w-4.5" />
@@ -57,7 +57,7 @@ export default function Navbar() {
 
           <span>
             <span className="block text-lg font-semibold leading-none text-slate-900">
-              FieldShift
+              CropWise AI
             </span>
 
             <span className="mt-1 block text-[11px] leading-none text-slate-400">

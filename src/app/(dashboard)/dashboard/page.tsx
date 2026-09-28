@@ -41,7 +41,7 @@ export default function DashboardHomePage() {
       href: "/dashboard/climate-analysis",
     },
     {
-      title: isBn ? "ফিল্ডশিফট এআইকে জিজ্ঞাসা করুন" : "Ask FieldShift AI",
+      title: isBn ? "ক্রপওয়াইজ এআইকে জিজ্ঞাসা করুন" : "Ask CropWise AI",
       desc: isBn ? "কৃষি বিষয়ক যেকোনো প্রশ্নের সমাধান পান" : "Get answers to your farming questions",
       icon: MessageCircle,
       tone: "bg-sky-100 text-sky-600",
@@ -122,8 +122,8 @@ export default function DashboardHomePage() {
 
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
               {isBn
-                ? "ফিল্ডশিফট নাসার স্যাটেলাইট আর্থ অবজারভেশন ব্যবহার করে আপনার খামারের উপযোগী সহজ ও কার্যকর কৃষি পরামর্শ প্রদান করে।"
-                : "FieldShift uses NASA Earth observations to help you make better farming decisions — simple, practical, and tailored to your land."}
+                ? "ক্রপওয়াইজ এআই নাসার স্যাটেলাইট আর্থ অবজারভেশন ব্যবহার করে আপনার খামারের উপযোগী সহজ ও কার্যকর কৃষি পরামর্শ প্রদান করে।"
+                : "CropWise AI uses NASA Earth observations to help you make better farming decisions — simple, practical, and tailored to your land."}
             </p>
           </div>
 
@@ -218,7 +218,7 @@ export default function DashboardHomePage() {
         <div className="rounded-2xl border border-slate-100 bg-white p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-slate-900">
-              {isBn ? "ফিল্ডশিফট যেভাবে কাজ করে" : "How FieldShift Works"}
+              {isBn ? "ক্রপওয়াইজ এআই যেভাবে কাজ করে" : "How CropWise AI Works"}
             </h2>
             <Link href="/dashboard/about" className="flex items-center gap-1 text-xs font-semibold text-primary-700">
               {isBn ? "আরও জানুন" : "Learn more"} <ArrowRight className="h-3.5 w-3.5" />

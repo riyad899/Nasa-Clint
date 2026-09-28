@@ -10,9 +10,9 @@ export default function Footer() {
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-700 text-white">
             <Leaf className="h-3.5 w-3.5" />
           </span>
-          <span className="font-semibold text-slate-800">FieldShift</span>
+          <span className="font-semibold text-slate-800">CropWise AI</span>
         </div>
-        <p>© {new Date().getFullYear()} FieldShift. Same Land. New Insights. Stronger Futures.</p>
+        <p>© {new Date().getFullYear()} CropWise AI. Same Land. New Insights. Stronger Futures.</p>
         <div className="flex gap-5">
           <Link href="/" className="hover:text-slate-800">Privacy</Link>
           <Link href="/" className="hover:text-slate-800">Terms</Link>
