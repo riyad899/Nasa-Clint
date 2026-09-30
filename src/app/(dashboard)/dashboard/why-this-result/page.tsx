@@ -35,7 +35,6 @@ import {
   TransparencyResponse,
 } from "@/lib/apis/analyzeAi";
 
-// Handwritten font — same one used across the app for consistency
 const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
 
 const rainfall = { hist: [40, 85, 215, 210, 140, 65], recent: [55, 110, 185, 180, 110, 55] };
@@ -154,12 +153,11 @@ export default function WhyThisResultPage() {
   };
 
   return (
-    <div className="pb-8">
+    <div className="pb-24 md:pb-8">
       <TransparentNavSlot />
 
       {/* ================= HERO ================= */}
-      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
-        {/* Background image */}
+      <section className="relative min-h-[300px] overflow-hidden bg-[#fbfcfa] sm:min-h-[320px]">
         <div className="absolute inset-0">
           <div
             className="absolute inset-0 bg-cover bg-[center_60%]"
@@ -168,31 +166,36 @@ export default function WhyThisResultPage() {
                 "url('https://i.ibb.co.com/tp4x9fn8/Chat-GPT-Image-Sep-24-2026-11-33-05-PM.png')",
             }}
           />
-          {/* Minimal left fade so heading text is legible */}
-          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
-          {/* Top fade for readable navbar */}
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
-          {/* Smoky bottom blend into #f5f7f5 */}
+          {/* Left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[85%] bg-gradient-to-r from-[#fbfcfa]/90 via-[#fbfcfa]/50 to-transparent sm:w-[45%] sm:from-[#fbfcfa]/100 sm:via-transparent" />
+          {/* Top fade for navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/10 to-transparent sm:from-black/20" />
+          {/* Bottom blend */}
           <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
-          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 hidden h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent sm:block" />
         </div>
 
-        {/* Text content */}
-        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+        <div className="relative px-5 pb-20 pt-24 sm:px-10 sm:pb-24 sm:pt-24">
           <div className="max-w-md">
-            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+            {/* Mobile only label */}
+            <p className="mb-2 flex items-center gap-3 text-[11px] font-medium tracking-[0.2em] text-primary-800 sm:hidden">
+              ANALYSIS INSIGHTS
+              <span className="h-px w-6 bg-primary-700" />
+            </p>
+
+            <h1 className="text-[32px] font-bold leading-tight text-slate-900 sm:text-4xl sm:font-semibold">
               Why This Result?
             </h1>
-            <p className="mt-1 text-lg font-semibold text-[#173d2a]">
+            <p className="mt-1 text-xl font-bold text-slate-900 sm:text-lg sm:font-semibold sm:text-[#173d2a]">
               {location} · {crop}
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            <p className="mt-2 max-w-[300px] text-[13px] leading-relaxed text-slate-700 sm:max-w-none sm:text-sm sm:text-slate-600">
               Understand how NASA Earth data and AI analysis lead to this recommendation.
             </p>
           </div>
 
           <p
-            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+            className={`${script.className} absolute bottom-14 right-4 -rotate-[8deg] text-[17px] leading-5 text-white drop-shadow sm:bottom-auto sm:right-10 sm:top-24 sm:-rotate-2 sm:text-2xl sm:leading-6`}
           >
             Data Drives
             <br />
@@ -202,7 +205,7 @@ export default function WhyThisResultPage() {
       </section>
 
       {/* Floating FilterBar card */}
-      <div className="relative -mt-12 z-10 mb-8 px-4 sm:px-6">
+      <div className="relative z-10 -mt-10 mb-4 px-4 sm:-mt-12 sm:mb-8 sm:px-6">
         <FilterBar
           variant="card"
           location={location}
@@ -217,21 +220,26 @@ export default function WhyThisResultPage() {
       </div>
 
       {/* Content wrapper */}
-      <div className="space-y-6 px-4 sm:px-6">
+      <div className="space-y-4 px-4 sm:space-y-6 sm:px-6">
 
+      {/* ================= RECOMMENDATION BANNER ================= */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="flex items-start gap-3 rounded-2xl border border-primary-100 bg-primary-50 p-5">
+        <div className="flex items-start gap-3 rounded-2xl border border-primary-100 bg-primary-50 p-4 sm:p-5">
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-700 text-white">
             <Lightbulb className="h-5 w-5" />
           </span>
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Our recommendation is based on real changes in your local climate.</h2>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">
+            <h2 className="text-sm font-bold text-slate-900 sm:text-base sm:font-semibold">
+              Our recommendation is based on real changes in your local climate.
+            </h2>
+            <p className="mt-1 text-[13px] leading-relaxed text-slate-600 sm:text-sm">
               We analyze NASA satellite data (rainfall, temperature, soil moisture, and vegetation) and compare recent trends with historical patterns to find the best time and strategy for your crop.
             </p>
           </div>
         </div>
-        <div className="flex flex-col justify-center rounded-2xl border border-primary-100 bg-primary-50 p-5">
+
+        {/* Quote card: mobile e hidden */}
+        <div className="hidden flex-col justify-center rounded-2xl border border-primary-100 bg-primary-50 p-5 sm:flex">
           <Quote className="h-5 w-5 -rotate-1 text-primary-400" />
           <p className={`${script.className} -mt-1 -rotate-1 text-xl leading-snug text-primary-800`}>
             Smarter insights today, stronger harvests tomorrow.
@@ -239,21 +247,46 @@ export default function WhyThisResultPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ================= METRICS ================= */}
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {metrics.map((m) => (
-          <div key={m.label} className="flex flex-col rounded-2xl border border-slate-100 bg-white p-4">
-            <div className="flex items-center gap-2">
-              <span className={`flex h-8 w-8 items-center justify-center rounded-full ${m.tone}`}>
-                <m.icon className="h-4 w-4" />
-              </span>
-              <span className="text-xs font-medium text-slate-500">{m.label}</span>
-              <Info className="ml-auto h-3.5 w-3.5 text-slate-300" />
-            </div>
-            <p className="mt-2 text-2xl font-semibold text-slate-900">{m.value}</p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-400">{m.desc}</p>
+          <div
+            key={m.label}
+            className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 sm:flex-col sm:items-stretch sm:gap-0"
+          >
+            {/* Mobile: big icon left */}
+            <span className={`flex h-11 w-11 shrink-0 items-center justify-center self-start rounded-full sm:hidden ${m.tone}`}>
+              <m.icon className="h-5 w-5" />
+            </span>
 
-            <div className="mt-3">
-              <ChartLegend lightColor={m.light} darkColor={m.dark} />
+            {/* Text */}
+            <div className="min-w-0 flex-1 sm:flex-none">
+              {/* Desktop header */}
+              <div className="hidden items-center gap-2 sm:flex">
+                <span className={`flex h-8 w-8 items-center justify-center rounded-full ${m.tone}`}>
+                  <m.icon className="h-4 w-4" />
+                </span>
+                <span className="text-xs font-medium text-slate-500">{m.label}</span>
+                <Info className="ml-auto h-3.5 w-3.5 text-slate-300" />
+              </div>
+
+              {/* Mobile label */}
+              <span className="text-xs font-medium text-slate-500 sm:hidden">{m.label}</span>
+
+              <p className="text-xl font-bold text-slate-900 sm:mt-2 sm:text-2xl sm:font-semibold">{m.value}</p>
+              <p className="mt-1 text-[11px] leading-snug text-slate-400 sm:text-xs sm:leading-relaxed">{m.desc}</p>
+
+              {/* Mobile legend */}
+              <div className="mt-2 sm:hidden">
+                <ChartLegend lightColor={m.light} darkColor={m.dark} />
+              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="w-[46%] shrink-0 sm:mt-3 sm:w-full">
+              <div className="hidden sm:block">
+                <ChartLegend lightColor={m.light} darkColor={m.dark} />
+              </div>
               {m.type === "bar" ? (
                 <MiniBarChart hist={m.data.hist} recent={m.data.recent} max={m.max} lightColor={m.light} darkColor={m.dark} />
               ) : (
@@ -261,26 +294,36 @@ export default function WhyThisResultPage() {
               )}
             </div>
 
-            <p className={`mt-auto rounded-xl p-3 text-xs leading-relaxed ${m.noteBg}`}>{m.note}</p>
+            {/* Note: mobile e hidden */}
+            <p className={`mt-auto hidden rounded-xl p-3 text-xs leading-relaxed sm:mt-3 sm:block ${m.noteBg}`}>{m.note}</p>
           </div>
         ))}
       </section>
 
+      {/* ================= STEPS + TAKEAWAY ================= */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="rounded-2xl border border-slate-100 bg-white p-5">
-          <h2 className="text-base font-semibold text-slate-900">How We Arrive at the Recommendation</h2>
-          <div className="mt-5 flex items-start justify-between gap-2 overflow-x-auto">
+        <div className="rounded-2xl border border-slate-100 bg-white p-4 sm:p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 sm:text-base sm:font-semibold">How We Arrive at the Recommendation</h2>
+            <span className="hidden shrink-0 items-center gap-1 text-[11px] font-medium text-slate-700 max-sm:flex">
+              See full explanation <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          </div>
+
+          <div className="-mx-4 mt-4 flex items-stretch gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-5 sm:items-start sm:justify-between sm:px-0">
             {steps.map((s, i) => (
               <React.Fragment key={s.title}>
-                <div className="w-28 flex-shrink-0 text-center sm:w-auto sm:flex-1">
-                  <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-50 text-primary-700">
-                    <s.icon className="h-6 w-6" />
+                <div className="flex w-[215px] flex-shrink-0 items-center gap-2.5 rounded-xl bg-primary-50/50 p-2.5 text-left sm:block sm:w-auto sm:flex-1 sm:bg-transparent sm:p-0 sm:text-center">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-700 sm:mx-auto sm:h-14 sm:w-14">
+                    <s.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </span>
-                  <p className="mt-2 text-xs font-semibold text-slate-800">{s.title}</p>
-                  <p className="mt-1 text-[11px] leading-relaxed text-slate-400">{s.desc}</p>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-slate-800 sm:mt-2">{s.title}</p>
+                    <p className="mt-0.5 text-[10px] leading-snug text-slate-400 sm:mt-1 sm:text-[11px] sm:leading-relaxed">{s.desc}</p>
+                  </div>
                 </div>
                 {i < steps.length - 1 && (
-                  <ArrowRight className="mt-7 h-4 w-4 flex-shrink-0 text-slate-300" />
+                  <ArrowRight className="h-4 w-4 flex-shrink-0 self-center text-slate-300 sm:mt-7 sm:self-start" />
                 )}
               </React.Fragment>
             ))}
@@ -297,7 +340,7 @@ export default function WhyThisResultPage() {
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             The combination of later rainfall, higher temperatures, and adequate soil moisture suggests that the optimal planting window for {crop} in {location} is:
           </p>
-          <span className="mt-3 flex items-center gap-2 rounded-lg bg-primary-800 px-4 py-2.5 text-sm font-bold text-white w-fit">
+          <span className="mt-3 flex w-fit items-center gap-2 rounded-lg bg-primary-800 px-4 py-2.5 text-sm font-bold text-white">
             <Calendar className="h-4 w-4" /> 15 – 25 JULY
           </span>
           <p className="mt-3 text-xs leading-relaxed text-slate-500">

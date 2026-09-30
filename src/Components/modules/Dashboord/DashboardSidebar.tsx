@@ -1,7 +1,9 @@
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+
 import {
   Home,
   CloudSun,
@@ -10,7 +12,6 @@ import {
   BotMessageSquare,
   BookOpen,
   Info,
-  X
 } from "lucide-react";
 
 import { useLanguage } from "@/lib/language-context";
@@ -21,107 +22,170 @@ interface DashboardSidebarProps {
 }
 
 const navItems = [
-  { key: "nav_home", label: "Home", href: "/dashboard", icon: Home },
-  { key: "nav_climate_analysis", label: "Climate Analysis", href: "/dashboard/climate-analysis", icon: CloudSun },
-  { key: "nav_recommendations", label: "Recommendations", href: "/dashboard/recommendations", icon: ClipboardCheck },
-  { key: "nav_why_this_result", label: "Why This Result?", href: "/dashboard/why-this-result", icon: HelpCircle },
-  { key: "nav_ask_ai", label: "Ask CropWise AI", href: "/dashboard/ask-ai", icon: BotMessageSquare },
-  { key: "nav_learn", label: "Learn", href: "/dashboard/learn", icon: BookOpen },
-  { key: "nav_about", label: "About", href: "/dashboard/about", icon: Info },
+  {
+    key: "nav_home",
+    label: "Home",
+    href: "/dashboard",
+    icon: Home,
+  },
+  {
+    key: "nav_climate_analysis",
+    label: "Climate Analysis",
+    href: "/dashboard/climate-analysis",
+    icon: CloudSun,
+  },
+  {
+    key: "nav_recommendations",
+    label: "Recommendations",
+    href: "/dashboard/recommendations",
+    icon: ClipboardCheck,
+  },
+  {
+    key: "nav_why_this_result",
+    label: "Why This Result?",
+    href: "/dashboard/why-this-result",
+    icon: HelpCircle,
+  },
+  {
+    key: "nav_ask_ai",
+    label: "Ask CropWise AI",
+    href: "/dashboard/ask-ai",
+    icon: BotMessageSquare,
+  },
+  {
+    key: "nav_learn",
+    label: "Learn",
+    href: "/dashboard/learn",
+    icon: BookOpen,
+  },
+  {
+    key: "nav_about",
+    label: "About",
+    href: "/dashboard/about",
+    icon: Info,
+  },
 ] as const;
 
-export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
+export default function DashboardSidebar({
+  isOpen,
+  onClose,
+}: DashboardSidebarProps) {
   const pathname = usePathname();
   const { t, lang } = useLanguage();
 
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
+      {/* =====================================================
+          DESKTOP SIDEBAR
+          ===================================================== */}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-56 flex-col  bg-slate-50 transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-56 flex-col bg-slate-50 transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-  <div className="flex h-[76px] items-center justify-between  px-2">
-  <Link href="/" className="relative flex items-center">
-    {/* Leaf Image */}
-    <Image
-      src="/Green%20Leaf.png"
-      alt="CropWise AI"
-      width={70}
-      height={70}
-      className="h-15 w-15 shrink-0 object-contain"
-      priority
-    />
+        {/* Desktop Logo */}
+        <div className="flex h-[76px] items-center px-2">
+          <Link href="/" className="relative flex items-center">
+            <Image
+              src="/Green%20Leaf.png"
+              alt="CropWise AI"
+              width={70}
+              height={70}
+              className="h-15 w-15 shrink-0 object-contain"
+              priority
+            />
 
-    {/* Text over image */}
-    <div className="absolute left-[55px] top-1/2 -translate-y-1/2 whitespace-nowrap">
-      <span className="block text-[20px] font-semibold leading-none text-slate-900">
-        CropWise AI
-      </span>
+            <div className="absolute left-[55px] top-1/2 -translate-y-1/2 whitespace-nowrap">
+              <span className="block text-[20px] font-semibold leading-none text-slate-900">
+                CropWise AI
+              </span>
 
-      <span className="mt-1 block text-[9px] leading-none text-primary-600">
-        {t("tagline")}
-      </span>
-    </div>
-  </Link>
+              <span className="mt-1 block text-[9px] leading-none text-primary-600">
+                {t("tagline")}
+              </span>
+            </div>
+          </Link>
+        </div>
 
-  <button
-    onClick={onClose}
-    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 md:hidden"
-    aria-label="Close sidebar"
-  >
-    <X className="h-5 w-5" />
-  </button>
-</div>
+        {/* Desktop Navigation */}
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => window.innerWidth < 768 && onClose()}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
                   isActive
                     ? "bg-primary-50 font-medium text-primary-800"
                     : "font-normal text-slate-600 hover:bg-primary-50/60"
                 }`}
               >
-                <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary-700" : "text-slate-400"}`} />
+                <Icon
+                  className={`h-4 w-4 shrink-0 ${
+                    isActive ? "text-primary-700" : "text-slate-400"
+                  }`}
+                />
+
                 {t(item.key, item.label)}
               </Link>
             );
           })}
         </nav>
 
-        <div className="relative h-[106px]  bg-[#f4f8fb] px-4 py-3">
-          {/* Decorative plant image, sitting behind/to the side */}
+        {/* Desktop Bottom Section */}
+        <div className="relative h-[106px] bg-[#f4f8fb] px-4 py-3">
           <img
             src="/Leaf.png"
             alt=""
-            className="pointer-events-none absolute right-[70px] top-[-100px] bottom-1 h-[200px] w-[140px] object-contain mix-blend-multiply"
+            className="pointer-events-none absolute bottom-1 right-[70px] top-[-100px] h-[200px] w-[140px] object-contain mix-blend-multiply"
           />
 
-          {/* Text sits on top, offset so it doesn't collide with the leaf */}
           <div className="relative z-10 ml-12 mt-[-30px] pt-[-50px]">
             <p className="max-w-[150px] text-[11px] font-medium leading-[1.25] text-[#163b36]">
-              {lang === "BN" ? "কৃষকদের জন্য জলবায়ু-সহনশীল ভবিষ্যৎ" : "A Climate-Resilient Future for Farmers"}
+              {lang === "BN"
+                ? "কৃষকদের জন্য জলবায়ু-সহনশীল ভবিষ্যৎ"
+                : "A Climate-Resilient Future for Farmers"}
             </p>
+
             <p className="mt-2 max-w-[155px] text-[9px] leading-[1.35] text-slate-500">
-              {lang === "BN" ? "পৃথিবীর উপাত্ত। স্থানীয় অগ্রগতি। সমৃদ্ধ খামার।" : "Earth data. Local impact. Stronger farms."}
+              {lang === "BN"
+                ? "পৃথিবীর উপাত্ত। স্থানীয় অগ্রগতি। সমৃদ্ধ খামার।"
+                : "Earth data. Local impact. Stronger farms."}
             </p>
           </div>
         </div>
       </aside>
+
+      {/* =====================================================
+          MOBILE BOTTOM SIDEBAR
+          ONLY ICONS - NO HAMBURGER
+          ===================================================== */}
+
+      <nav className="fixed bottom-0 left-0 right-0 z-[100] flex h-[64px] items-center justify-around border-t border-slate-200 bg-[#fbfaf7]/95 px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur md:hidden">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-label={item.label}
+              className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all ${
+                isActive
+                  ? "bg-primary-100 text-primary-700"
+                  : "text-slate-400 hover:bg-primary-50 hover:text-primary-700"
+              }`}
+            >
+              <Icon className="h-[21px] w-[21px]" />
+            </Link>
+          );
+        })}
+      </nav>
     </>
   );
 }

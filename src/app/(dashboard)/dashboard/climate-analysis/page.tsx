@@ -17,6 +17,9 @@ import {
   Sprout,
   Quote,
   ArrowRight,
+  ArrowLeft,
+  Check,
+  Cloud,
   Loader2,
   AlertCircle,
   CheckCircle2,
@@ -109,6 +112,17 @@ function buildAnalyzeRequest(loc: string, crp: string): AnalyzeRequest {
 const months = ["May", "Jun", "Jul", "Aug", "Sep", "Oct"];
 const rainfall = { hist: [40, 85, 215, 210, 140, 65], recent: [55, 110, 185, 180, 110, 55] };
 const temperature = { hist: [27, 29, 31, 32, 31, 28], recent: [31, 33, 35, 36, 35, 32] };
+
+// Mobile loading screen steps
+const loadingSteps = [
+  { en: "Retrieving climate data", bn: "জলবায়ু উপাত্ত সংগ্রহ হচ্ছে", icon: Cloud },
+  { en: "Analyzing rainfall patterns", bn: "বৃষ্টিপাতের ধরন বিশ্লেষণ", icon: CloudRain },
+  { en: "Processing temperature trends", bn: "তাপমাত্রার ধারা প্রক্রিয়াকরণ", icon: Thermometer },
+  { en: "Analyzing soil moisture", bn: "মাটির আর্দ্রতা বিশ্লেষণ", icon: Droplet },
+  { en: "Analyzing vegetation (NDVI)", bn: "উদ্ভিদ সূচক (NDVI) বিশ্লেষণ", icon: Leaf },
+  { en: "Generating recommendations", bn: "সুপারিশ তৈরি হচ্ছে", icon: Sprout },
+  { en: "Preparing AI explanation", bn: "এআই ব্যাখ্যা প্রস্তুত হচ্ছে", icon: Cpu },
+];
 
 // ================= CHARTS =================
 
@@ -275,6 +289,20 @@ function ClimateAnalysisContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysisData, setAnalysisData] = useState<OnsetAnalysisData | null>(null);
+  const [loadStep, setLoadStep] = useState(0);
+
+  // Mobile loading screen: step gulo timer diye ek ek kore tick hoy
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadStep(0);
+      return;
+    }
+    const id = setInterval(
+      () => setLoadStep((s) => Math.min(s + 1, loadingSteps.length - 1)),
+      1400
+    );
+    return () => clearInterval(id);
+  }, [isLoading]);
 
   const executeAnalysis = async (targetLoc: string, targetCrop: string, targetPri: string) => {
     if (!targetLoc || !targetCrop || !targetPri) return;
@@ -429,9 +457,9 @@ function ClimateAnalysisContent() {
         </section>
       )}
 
-      {/* ── LOADING STATE ────────────────────────────────────────────────────── */}
+      {/* ── LOADING STATE: Desktop ───────────────────────────────────────────── */}
       {isLoading && (
-        <section className={`mb-8 ${SECTION_X}`}>
+        <section className={`mb-8 hidden sm:block ${SECTION_X}`}>
           <div className="rounded-2xl border border-primary-100 bg-white/90 p-8 text-center shadow-sm backdrop-blur">
             <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary-100 opacity-75" />
@@ -450,6 +478,89 @@ function ClimateAnalysisContent() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* ── LOADING STATE: Mobile full-screen ────────────────────────────────── */}
+      {isLoading && (
+        <div className="fixed inset-0 z-[120] flex flex-col overflow-hidden bg-gradient-to-b from-[#e8f4fb] via-[#f3faf6] to-[#fbfcfa] sm:hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 pb-3 pt-12">
+            <button
+              onClick={() => router.back()}
+              aria-label="Cancel"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <h2 className="flex-1 pr-9 text-center text-lg font-bold text-slate-900">
+              {isBn ? "আপনার খামার বিশ্লেষণ হচ্ছে" : "Analyzing Your Farm"}
+            </h2>
+          </div>
+
+          <p className="px-5 text-sm leading-snug text-slate-600">
+            {isBn
+              ? "আপনার এলাকা ও ফসলের জন্য নাসার আর্থ অবজারভেশন প্রক্রিয়া করা হচ্ছে।"
+              : "We are processing NASA Earth observations for your location and crop."}
+          </p>
+
+          {/* Steps */}
+          <ul className="relative z-10 mt-5 space-y-3.5 px-5">
+            {loadingSteps.map((s, i) => {
+              const done = i < loadStep;
+              const active = i === loadStep;
+              return (
+                <li key={s.en} className="flex items-center gap-3">
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+                      done || active ? "bg-primary-100 text-primary-700" : "bg-slate-100 text-slate-400"
+                    }`}
+                  >
+                    <s.icon className="h-[18px] w-[18px]" />
+                  </span>
+
+                  <span
+                    className={`flex-1 text-[15px] ${
+                      done || active ? "font-medium text-slate-800" : "text-slate-500"
+                    }`}
+                  >
+                    {isBn ? s.bn : s.en}
+                  </span>
+
+                  {done ? (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-700 text-white">
+                      <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                    </span>
+                  ) : active ? (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary-100">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary-700" />
+                    </span>
+                  ) : (
+                    <span className="h-6 w-6 rounded-full border-2 border-slate-300" />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Bottom landscape + satellite */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%]">
+            <div
+              className="absolute inset-0 bg-cover bg-bottom"
+              style={{
+                backgroundImage:
+                  "url('https://i.ibb.co.com/HDzJ2h3N/Screenshot-2026-09-24-at-11-31-21-PM.png')",
+              }}
+            />
+            <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#fbfcfa] to-transparent" />
+
+            <div className="absolute left-1/2 top-2 -translate-x-1/2">
+              <div className="relative flex h-24 w-24 items-center justify-center">
+                <span className="absolute inset-3 animate-ping rounded-full bg-primary-200/60" />
+                <Satellite className="relative h-16 w-16 -rotate-12 text-slate-700 drop-shadow" />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── RESULTS ──────────────────────────────────────────────────────────── */}
