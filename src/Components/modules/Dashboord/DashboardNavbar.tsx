@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Bell, ChevronDown, LogOut } from "lucide-react";
 import { useAuth, initials } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
+import Link from "next/link";
 
 interface DashboardNavbarProps {
   onToggleSidebar?: () => void;
@@ -33,6 +34,12 @@ export default function DashboardNavbar({
   const handleBack = () => {
     if (window.history.length > 1) router.back();
     else router.push("/dashboard");
+  };
+
+  // Clicking the name/email block in the menu takes the user to their profile page.
+  const handleGoToProfile = () => {
+    setMenuOpen(false);
+    router.push("/dashboard/profile");
   };
 
   // ── Style tokens (solid ↔ transparent) ──
@@ -127,16 +134,15 @@ export default function DashboardNavbar({
                 onClick={() => setMenuOpen(false)}
               />
               <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg">
-                <div className="px-2.5 py-2">
-                  <p className="text-sm font-semibold text-slate-800">
-                    {displayName}
-                  </p>
-                  {user?.email && (
-                    <p className="truncate text-xs text-slate-400">
-                      {user.email}
-                    </p>
-                  )}
-                </div>
+                <Link
+                    href="/dashboard/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-lg px-2.5 py-2 hover:bg-slate-50"
+                  >
+                    <p className="text-sm font-semibold text-slate-800">{displayName}</p>
+                    {user?.email && <p className="truncate text-xs text-slate-400">{user.email}</p>}
+                  </Link>
+
                 <button
                   onClick={handleLogout}
                   className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-rose-600 hover:bg-rose-50"

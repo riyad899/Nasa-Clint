@@ -191,11 +191,7 @@ export default function HomePage() {
                 Get Started <ArrowRight className="h-4 w-4" />
               </Link>
 
-              <div className="mt-4 flex gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-                <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
-              </div>
+              
             </div>
 
             {/* FEATURES (Desktop only) */}

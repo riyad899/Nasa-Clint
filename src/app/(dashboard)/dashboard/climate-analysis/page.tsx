@@ -555,8 +555,8 @@ function ClimateAnalysisContent() {
 
             <div className="absolute left-1/2 top-2 -translate-x-1/2">
               <div className="relative flex h-24 w-24 items-center justify-center">
-                <span className="absolute inset-3 animate-ping rounded-full bg-primary-200/60" />
-                <Satellite className="relative h-16 w-16 -rotate-12 text-slate-700 drop-shadow" />
+                {/* <span className="absolute inset-3 animate-ping rounded-full bg-primary-200/60" /> */}
+                {/* <Satellite className="relative h-16 w-16 -rotate-12 text-slate-700 drop-shadow" /> */}
               </div>
             </div>
           </div>
