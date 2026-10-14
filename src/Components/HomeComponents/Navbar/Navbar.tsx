@@ -42,7 +42,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-primary-100 bg-[#fbfaf7]/95 backdrop-blur">
+    <header className="sticky top-0 z-50 hidden border-b border-primary-100 bg-[#fbfaf7]/95 backdrop-blur md:block">
       <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8">
 
         {/* CropWise AI Logo */}
