@@ -218,7 +218,7 @@ export async function saveAnalysisToHistory(data: any): Promise<{ success: boole
   return httpClient.post<{ success: boolean; data: any }>("/analyses/save", data);
 }
 
-export interface ProboyChatPayload {
+export interface ICropWiseChatPayload {
   conversationId?: string;
   message: string;
   guestSessionId?: string;
@@ -231,7 +231,7 @@ export interface ProboyChatPayload {
   language?: "BN" | "EN" | "bn" | "en";
 }
 
-export interface ProboyChatResponse {
+export interface ICropWiseChatResponse {
   success: boolean;
   message: string;
   data: {
@@ -256,9 +256,22 @@ export interface ProboyChatResponse {
   };
 }
 
-export async function sendProboyChatMessage(payload: ProboyChatPayload): Promise<ProboyChatResponse> {
-  return httpClient.post<ProboyChatResponse>("/proboy/chat", payload, {
-    timeout: 60000,
-  });
+export type ProboyChatPayload = ICropWiseChatPayload;
+export type ProboyChatResponse = ICropWiseChatResponse;
+
+export async function sendCropWiseChatMessage(payload: ICropWiseChatPayload): Promise<ICropWiseChatResponse> {
+  try {
+    return await httpClient.post<ICropWiseChatResponse>("/cropwise/chat", payload, {
+      timeout: 60000,
+    });
+  } catch (err: any) {
+    // Fallback to /proboy/chat if needed
+    return await httpClient.post<ICropWiseChatResponse>("/proboy/chat", payload, {
+      timeout: 60000,
+    });
+  }
 }
+
+export const sendProboyChatMessage = sendCropWiseChatMessage;
+
 

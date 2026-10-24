@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { TransparentNavSlot } from "../../header-context";
 import { useAnalysis } from "@/lib/analysis-context";
 import { useAuth } from "@/lib/auth-context";
-import { sendProboyChatMessage } from "@/lib/apis/analyzeAi";
+import { sendCropWiseChatMessage } from "@/lib/apis/analyzeAi";
 import UserAvatar from "@/Components/common/UserAvatar";
 
 
@@ -63,7 +63,7 @@ const initialMessages: Message[] = [
     from: "bot",
     time: "Just now",
     text:
-      "Hello! I'm Proboy AI 🌱\nI am your context-aware agricultural assistant powered by NASA Earth observations, your saved climate analyses, and connected ESP32 field sensors.\n\nYou can ask me questions in বাংলা, Banglish, or English:\n• আমার ডিভাইসের বর্তমান অবস্থা ও sensor reading কী?\n• আমার আগের Climate Analysis অনুযায়ী এখন কী করা উচিত?\n• পাম্প চালু বা বন্ধ করার নির্দেশ দাও।\n• বৃষ্টির onset পরিবর্তনের প্রভাব ব্যাখ্যা করো।",
+      "Hello! I'm CropWise AI 🌱\nI am your context-aware agricultural assistant powered by NASA Earth observations, your saved climate analyses, and connected ESP32 field sensors.\n\nYou can ask me questions in বাংলা, Banglish, or English:\n• আমার ডিভাইসের বর্তমান অবস্থা ও sensor reading কী?\n• আমার আগের Climate Analysis অনুযায়ী এখন কী করা উচিত?\n• পাম্প চালু বা বন্ধ করার নির্দেশ দাও।\n• বৃষ্টির onset পরিবর্তনের প্রভাব ব্যাখ্যা করো।",
   },
 ];
 
@@ -118,7 +118,7 @@ export default function AskAiPage() {
     setIsSending(true);
 
     try {
-      const res = await sendProboyChatMessage({
+      const res = await sendCropWiseChatMessage({
         conversationId: conversationId || undefined,
         message: userMsg,
         location: { district: location },
