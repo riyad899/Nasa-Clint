@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import { useLanguage } from "@/lib/language-context";
+import DeviceConnectGate from "@/Components/modules/Device/DeviceConnectGate";
 
 const script = Caveat({
   subsets: ["latin"],
@@ -59,7 +60,7 @@ const sampleSpokenPrompts = [
   },
 ];
 
-export default function VoiceAssistantPage() {
+function VoiceAssistantContent() {
   const { lang, setLang } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -392,5 +393,16 @@ export default function VoiceAssistantPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VoiceAssistantPage() {
+  return (
+    <DeviceConnectGate
+      pageTitle="Voice Assistant & Hands-Free Commands"
+      pageSubtitle="Connect your ESP32 device to use voice commands to toggle irrigation motors and query field sensors."
+    >
+      <VoiceAssistantContent />
+    </DeviceConnectGate>
   );
 }

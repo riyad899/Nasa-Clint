@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { LanguageProvider } from "@/lib/language-context";
+import { AnalysisProvider } from "@/lib/analysis-context";
 
 export const metadata: Metadata = {
   title: {
@@ -28,9 +29,12 @@ export default function RootLayout({
     <html lang="en" className="h-full scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-white text-slate-900 antialiased" suppressHydrationWarning>
         <AuthProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <AnalysisProvider>{children}</AnalysisProvider>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>
   );
 }
+

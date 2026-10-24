@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Caveat } from "next/font/google";
 import {
   Bot,
@@ -19,17 +19,23 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { TransparentNavSlot } from "../../header-context";
+import { useAnalysis } from "@/lib/analysis-context";
+import { useAuth } from "@/lib/auth-context";
+import { sendProboyChatMessage } from "@/lib/apis/analyzeAi";
+import UserAvatar from "@/Components/common/UserAvatar";
+
 
 const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
 
 const suggestions = [
+  "আমার ESP32 ডিভাইসের বর্তমান অবস্থা কী?",
+  "আমার আগের Climate Analysis অনুযায়ী এখন কী করা উচিত?",
+  "মাটির বর্তমান আর্দ্রতা ও তাপমাত্রা কত?",
   "কেন এই রোপণের সময় পরামর্শ দেওয়া হয়েছে?",
-  "আমি যদি ৩০ দিন আগে রোপণ করি?",
   "কম পানিতে কোন ফসল ভালো হবে?",
-  "ফসল আবর্তন (crop rotation) কীভাবে করব?",
-  "বৃষ্টিপাত দেরি হলে কী করব?",
-  "Explain this result in simple English",
+  "পাম্প ৫ মিনিটের জন্য চালাও",
 ];
 
 const resources = [
@@ -44,14 +50,20 @@ interface Message {
   text: string;
   time: string;
   showChartsCta?: boolean;
+  sources?: Array<{
+    type: string;
+    title: string;
+    timestamp?: string;
+    details?: any;
+  }>;
 }
 
 const initialMessages: Message[] = [
   {
     from: "bot",
-    time: "10:24 AM",
+    time: "Just now",
     text:
-      "Hello! I'm CropWise AI 🌱\nI can help you understand climate trends, recommendations, and farming practices for your area. You can ask questions in Bangla or English.\n\nHere are some things you can ask:\n• Why is the recommended planting window 15 – 25 July?\n• What will happen if I plant earlier?\n• Which crop is better with less water?\n• How does rainfall affect Aman rice?\n• Tell me about crop rotation for my area.\n• Give me simple tips to save water.\n• Explain this result in simple Bangla.\n• Compare Aman rice and Boro rice.",
+      "Hello! I'm Proboy AI 🌱\nI am your context-aware agricultural assistant powered by NASA Earth observations, your saved climate analyses, and connected ESP32 field sensors.\n\nYou can ask me questions in বাংলা, Banglish, or English:\n• আমার ডিভাইসের বর্তমান অবস্থা ও sensor reading কী?\n• আমার আগের Climate Analysis অনুযায়ী এখন কী করা উচিত?\n• পাম্প চালু বা বন্ধ করার নির্দেশ দাও।\n• বৃষ্টির onset পরিবর্তনের প্রভাব ব্যাখ্যা করো।",
   },
 ];
 
@@ -71,31 +83,109 @@ const renderText = (text: string) =>
   );
 
 export default function AskAiPage() {
-  const [location] = useState("Rajshahi");
-  const [crop] = useState("Aman Rice");
+  const router = useRouter();
+  const { activeAnalysis } = useAnalysis();
+  const { user } = useAuth();
+
+
+  const [location] = useState(activeAnalysis?.location?.district || "Rajshahi");
+  const [crop] = useState(activeAnalysis?.crop?.cropType === "aman_rice" ? "Aman Rice" : (activeAnalysis?.crop?.cropType || "Aman Rice"));
   const [priority] = useState("Save Water");
+
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const [lang, setLang] = useState<"BN" | "EN">("BN");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isSending]);
 
   const timeNow = () =>
     new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 
-  const send = (text: string) => {
-    if (!text.trim()) return;
+  const send = async (text: string) => {
+    if (!text.trim() || isSending) return;
+    const userMsg = text.trim();
+    setInput("");
+
     setMessages((prev) => [
       ...prev,
-      { from: "user", text, time: timeNow() },
-      {
-        from: "bot",
-        time: timeNow(),
-        text:
-          "রাজশাহীতে আমন ধানের জন্য ১৫ – ২৫ জুলাই রোপণের পরামর্শ দেওয়া হয়েছে কারণ সাম্প্রতিক বছরে (২০১৩ – ২০২৫) বৃষ্টিপাতের শুরু আগের তুলনায় প্রায় ১১ দিন দেরিতে হয়েছে। এ সময় মাটিতে পর্যাপ্ত আর্দ্রতা থাকে, যা চারা রোপণের জন্য উপযুক্ত।\n\nএছাড়াও, এই সময়ে তাপমাত্রা এবং মাটির আর্দ্রতার অবস্থা ধানের ভালো বৃদ্ধির জন্য সহায়ক। যদি আপনি আরও বিস্তারিত জানতে চান, আমি চার্ট ও ডেটা দেখাতে পারি।",
-        showChartsCta: true,
-      },
+      { from: "user", text: userMsg, time: timeNow() },
     ]);
-    setInput("");
+    setIsSending(true);
+
+    try {
+      const res = await sendProboyChatMessage({
+        conversationId: conversationId || undefined,
+        message: userMsg,
+        location: { district: location },
+        crop,
+        language: lang,
+      });
+
+      if (res && res.success && res.data) {
+        if (res.data.conversationId) {
+          setConversationId(res.data.conversationId);
+        }
+
+        const isClimateQuestion =
+          userMsg.toLowerCase().includes("climate") ||
+          userMsg.toLowerCase().includes("analysis") ||
+          userMsg.toLowerCase().includes("বৃষ্টি") ||
+          userMsg.toLowerCase().includes("রোপণ");
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            from: "bot",
+            time: timeNow(),
+            text: res.data.message.content,
+            sources: res.data.sources,
+            showChartsCta: isClimateQuestion || (res.data.sources && res.data.sources.some((s) => s.type === "climate_analysis")),
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            from: "bot",
+            time: timeNow(),
+            text: "দুঃখিত, কোনো উত্তর পাওয়া যায়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।",
+          },
+        ]);
+      }
+    } catch (err: any) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          from: "bot",
+          time: timeNow(),
+          text: `সংযোগ ত্রুটি: ${err?.message || "সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না।"}`,
+        },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
   };
+
+  // Auto-send query passed from Home or other pages via ?q=...
+  const initialQueryHandled = useRef(false);
+
+  useEffect(() => {
+    if (initialQueryHandled.current) return;
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get("q") || params.get("query") || params.get("message");
+    if (initialQuery && initialQuery.trim()) {
+      initialQueryHandled.current = true;
+      window.history.replaceState({}, "", "/dashboard/ask-ai");
+      send(initialQuery.trim());
+    }
+  }, []);
 
   return (
     <div className="pb-24 sm:pb-8">
@@ -160,8 +250,8 @@ export default function AskAiPage() {
       <div className="relative z-10 -mt-6 mb-5 space-y-6 px-4 sm:-mt-10 sm:mb-8 sm:px-6">
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
           {/* Chat panel */}
-          <div className="flex h-full flex-col justify-between overflow-hidden sm:rounded-2xl sm:border sm:border-slate-100 sm:bg-white">
-            <div className="flex-1 space-y-4 overflow-y-auto sm:p-4">
+          <div className="flex h-[600px] sm:h-[650px] lg:h-[700px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
+            <div className="flex-1 min-h-0 space-y-4 overflow-y-auto p-4 sm:p-5 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300">
               {messages.map((m, i) => (
                 <div key={i} className={`flex gap-3 ${m.from === "user" ? "flex-row-reverse" : ""}`}>
                   <span
@@ -175,8 +265,9 @@ export default function AskAiPage() {
                         <Bot className="hidden h-4 w-4 sm:block" />
                       </>
                     ) : (
-                      "R"
+                      <UserAvatar user={user} size="sm" />
                     )}
+
                   </span>
 
                   <div className={`flex min-w-0 max-w-[88%] flex-col sm:max-w-[80%] ${m.from === "user" ? "items-end" : "items-start"}`}>
@@ -188,9 +279,28 @@ export default function AskAiPage() {
                       }`}
                     >
                       {renderText(m.text)}
+
+                      {/* Source references */}
+                      {m.sources && m.sources.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-200/60 pt-2.5">
+                          {m.sources.map((s, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1 rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-medium text-slate-600 shadow-2xs border border-slate-200/70"
+                            >
+                              <span className={`h-1.5 w-1.5 rounded-full ${s.type.includes("device") ? "bg-emerald-500" : "bg-primary-500"}`} />
+                              {s.title}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
                       {m.showChartsCta && (
-                        <button className="mt-3 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
-                          <BarChart3 className="h-3.5 w-3.5" /> Show data and charts
+                        <button
+                          onClick={() => router.push("/dashboard/why-this-result")}
+                          className="mt-3 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                        >
+                          <BarChart3 className="h-3.5 w-3.5 text-primary-600" /> Show data and charts
                         </button>
                       )}
                     </div>
@@ -198,10 +308,27 @@ export default function AskAiPage() {
                   </div>
                 </div>
               ))}
+
+              {isSending && (
+                <div className="flex gap-3">
+                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700 sm:h-8 sm:w-8">
+                    <Bot className="h-4 w-4" />
+                  </span>
+                  <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-primary-600" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-primary-600 [animation-delay:0.2s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-primary-600 [animation-delay:0.4s]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Input bar */}
-            <div className="sticky bottom-16 z-20 mt-auto border-t border-slate-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] sm:static sm:mt-auto sm:border-t sm:border-slate-100 sm:px-4 sm:py-2.5 sm:shadow-none">
+            <div className="shrink-0 border-t border-slate-100 bg-white px-3.5 py-3 sm:px-4 sm:py-3">
               <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 py-1 transition-all focus-within:border-primary-600 focus-within:bg-white focus-within:ring-1 focus-within:ring-primary-600/20">
                 <button
                   type="button"

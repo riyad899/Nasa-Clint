@@ -4,21 +4,24 @@ import React, { useState } from "react";
 import { Caveat } from "next/font/google";
 import {
   Settings,
-  Sliders,
-  SlidersHorizontal,
+  Cpu,
   Power,
-  ShieldAlert,
+  ShieldCheck,
   Save,
   Check,
-  RotateCcw,
-  Clock,
+  RefreshCw,
+  Key,
+  Radio,
+  ExternalLink,
   Wifi,
-  Cpu,
   Zap,
-  Info,
+  Sliders,
+  ShieldAlert,
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import { useLanguage } from "@/lib/language-context";
+import { useDevice } from "@/context/device-context";
+import DeviceConnectModal from "@/Components/modules/Device/DeviceConnectModal";
 
 const script = Caveat({
   subsets: ["latin"],
@@ -29,16 +32,22 @@ export default function DeviceSettingsPage() {
   const { lang } = useLanguage();
   const isBn = lang === "BN";
 
-  // Form states
-  const [deviceName, setDeviceName] = useState("ESP32-S3 Agricultural Master");
-  const [motorHp, setMotorHp] = useState("1.5 HP");
-  const [motorType, setMotorType] = useState("Monoblock Centrifugal");
-  const [maxRuntime, setMaxRuntime] = useState(45); // minutes
+  const {
+    device,
+    isConnected,
+    isOnline,
+    disconnectDevice,
+    refreshData,
+    isLoadingData,
+    isSyncing,
+  } = useDevice();
+
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [deviceName, setDeviceName] = useState(device?.name || "ESP32 Master Agro");
+  const [deviceKey, setDeviceKey] = useState("102030");
+  const [maxRuntime, setMaxRuntime] = useState(45);
   const [dryRunProtection, setDryRunProtection] = useState(true);
   const [voltageCutoff, setVoltageCutoff] = useState(true);
-  const [relay1Pin, setRelay1Pin] = useState("GPIO 26");
-  const [relay2Pin, setRelay2Pin] = useState("GPIO 27");
-  const [timezone, setTimezone] = useState("Asia/Dhaka (GMT+6)");
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleSave = () => {
@@ -69,275 +78,272 @@ export default function DeviceSettingsPage() {
         <div className="relative px-6 pb-20 pt-24 sm:px-10 sm:pb-24 sm:pt-24">
           <div className="max-w-lg">
             <p className="mb-2 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-primary-700 uppercase sm:text-primary-800">
-              <SlidersHorizontal className="h-3.5 w-3.5 animate-pulse" />
-              {isBn ? "মোটর সেট সেটিংস ও ডিভাইস কনফিগারেশন" : "Actuator & Device Hardware Calibration"}
+              <Settings className="h-3.5 w-3.5" />
+              {isBn ? "ডিভাইস ও মোটর কনফিগারেশন" : "Device & Hardware Settings"}
             </p>
 
             <h1 className="text-3xl font-bold leading-tight text-white drop-shadow sm:text-4xl sm:font-semibold sm:text-slate-900 sm:drop-shadow-none">
-              {isBn ? "ডিভাইস ও মোটর সেটিংস" : "Device Settings"}
+              {isBn ? "ডিভাইস সেটিংস" : "Device Settings"}
             </h1>
 
             <p className="mt-2 text-sm leading-relaxed text-white/90 drop-shadow sm:text-slate-600 sm:drop-shadow-none">
               {isBn
-                ? "মোটরের এইচপি রেটিং, ড্রাই-রান সুরক্ষা, সর্বোচ্চ চলমান সময়সীমা, রিলে পিন এবং ডিভাইস প্যারামিটার কনফিগার করুন।"
-                : "Fine-tune motor horse-power ratings, safety runtime limits, dry-run cutoffs, relay pin mappings, and firmware parameters."}
+                ? "ESP32 মাইক্রোকন্ট্রোলারের সিক্রেট কী, ক্লাউড কানেকশন, লাইভ সিঙ্ক ও ডিসকানেক্ট অপশন এবং নিরাপত্তা সেটিংস পরিচালনা করুন।"
+                : "Manage authentication keys, cloud sync, device disconnect, and motor protection interlocks."}
             </p>
           </div>
-
-          <p
-            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
-          >
-            Custom Calibration.
-            <br />
-            Hardened Safety.
-          </p>
         </div>
       </section>
 
       {/* ================= CONTENT ================= */}
-      <div className="relative z-10 -mt-8 space-y-6 px-4 sm:-mt-10 sm:px-6">
+      <div className="relative z-10 -mt-8 space-y-6 px-4 sm:-mt-10 sm:px-6 max-w-4xl mx-auto">
 
-        {/* Save confirmation toast */}
-        {savedSuccess && (
-          <div className="flex items-center gap-2 rounded-2xl bg-emerald-600 p-4 text-xs font-semibold text-white shadow-lg animate-in fade-in slide-in-from-top-2">
-            <Check className="h-4 w-4" />
-            <span>
-              {isBn
-                ? "ডিভাইস ও মোটরের সেটিংস সফলভাবে সেভ করা হয়েছে এবং ESP32-তে সিঙ্ক হয়েছে!"
-                : "Motor and device settings saved successfully and synced to ESP32!"}
-            </span>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-          {/* Motor Set Settings Card */}
-          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-800">
-                <Zap className="h-5 w-5" />
+        {/* 1. Device Live Status & Sync / Disconnect Panel */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <Cpu className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  {isBn ? "মোটর সেট সেটিংস (Motor Set Settings)" : "Motor Set Settings & Parameters"}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-slate-900">
+                    {isConnected ? (device?.name || "ESP32 Master Agro") : (isBn ? "কোনো ডিভাইস কানেক্ট করা নেই" : "No Device Connected")}
+                  </h2>
+                  {isConnected && (
+                    <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-mono font-bold text-emerald-800">
+                      {device?.deviceId || "esp32-001"}
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-500">
-                  {isBn ? "সেচ মোটরের হর্স-পাওয়ার ও পাম্প স্পেসিফিকেশন" : "Physical pump electrical sizing and load thresholds"}
+                  {isConnected
+                    ? isBn
+                      ? "ডিভাইসটি সফলভাবে অথেনটিকেট ও সংযুক্ত আছে"
+                      : "ESP32 unit is authenticated and communicating with cloud"
+                    : isBn
+                    ? "রিয়েল-টাইম ডাটা পেতে ডিভাইসটি কানেক্ট করুন"
+                    : "Connect your ESP32 hardware to enable real telemetry"}
                 </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  {isBn ? "মোটর হর্সপাওয়ার (HP Rating)" : "Motor Horsepower (HP)"}
-                </label>
-                <select
-                  value={motorHp}
-                  onChange={(e) => setMotorHp(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-primary-600"
+            {/* Status & Actions: Sync Data & Disconnect (or Connect if disconnected) */}
+            <div className="flex items-center gap-2.5">
+              {isConnected ? (
+                <>
+                  {isSyncing ? (
+                    <span className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-300">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                      </span>
+                      <span>{isBn ? "স্ট্যাটাস সিঙ্ক হচ্ছে..." : "Status Syncing..."}</span>
+                    </span>
+                  ) : (
+                    <span
+                      className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+                        isOnline
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-amber-50 text-amber-700 border border-amber-200"
+                      }`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${isOnline ? "bg-emerald-500 animate-ping" : "bg-amber-500"}`} />
+                      {isOnline ? (isBn ? "অনলাইন (Online)" : "Online") : (isBn ? "অফলাইন" : "Offline")}
+                    </span>
+                  )}
+
+                  {/* Sync Data Button */}
+                  <button
+                    onClick={() => refreshData()}
+                    disabled={isSyncing}
+                    className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-75"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 text-emerald-600 ${isSyncing ? "animate-spin" : ""}`} />
+                    <span>
+                      {isSyncing
+                        ? (isBn ? "স্ট্যাটাস সিঙ্ক হচ্ছে..." : "Status Syncing...")
+                        : (isBn ? "সিঙ্ক করুন (Sync)" : "Sync Data")}
+                    </span>
+                  </button>
+
+                  {/* Disconnect Button */}
+                  <button
+                    onClick={disconnectDevice}
+                    className="flex items-center gap-1.5 rounded-xl border border-rose-300 bg-rose-50 px-3.5 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 active:scale-95"
+                  >
+                    <Power className="h-3.5 w-3.5" />
+                    <span>{isBn ? "ডিসকানেক্ট" : "Disconnect"}</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsConnectModalOpen(true)}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:from-emerald-700 hover:to-teal-800"
                 >
-                  <option>0.5 HP (370W)</option>
-                  <option>1.0 HP (750W)</option>
-                  <option>1.5 HP (1,120W)</option>
-                  <option>2.0 HP (1,500W)</option>
-                  <option>3.0 HP (2,200W)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  {isBn ? "পাম্পের ধরন (Pump Type)" : "Pump Architecture"}
-                </label>
-                <select
-                  value={motorType}
-                  onChange={(e) => setMotorType(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-primary-600"
-                >
-                  <option>Monoblock Centrifugal</option>
-                  <option>Submersible Borewell Pump</option>
-                  <option>Solar DC Brushless Pump</option>
-                  <option>Jet Well Pump</option>
-                </select>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-slate-700">
-                    {isBn ? "সর্বোচ্চ একটানা চলার সীমা (Max Continuous Run)" : "Max Continuous Runtime Limit"}
-                  </label>
-                  <span className="text-xs font-bold text-primary-700">{maxRuntime} {isBn ? "মিনিট" : "Mins"}</span>
-                </div>
-                <input
-                  type="range"
-                  min={10}
-                  max={120}
-                  step={5}
-                  value={maxRuntime}
-                  onChange={(e) => setMaxRuntime(Number(e.target.value))}
-                  className="w-full accent-primary-700"
-                />
-                <p className="mt-1 text-[11px] text-slate-400">
-                  {isBn
-                    ? "মোটর একটানা এই সময়ের বেশি চললে স্বয়ংক্রিয়ভাবে বন্ধ হবে যাতে কয়েল না পোড়ে।"
-                    : "Automatic thermal trip prevention ensures coils never burn out."}
-                </p>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <label className="flex items-center justify-between cursor-pointer rounded-2xl bg-slate-50 p-3 border border-slate-100">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">
-                      {isBn ? "ড্রাই-রান সুরক্ষা (Dry-run Protection)" : "Dry-Run Current Detection"}
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      {isBn ? "পানি না উঠলে ৬০ সেকেন্ডে মোটর স্বয়ংক্রিয় বন্ধ" : "Auto shutoff within 60s if no water load is detected"}
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={dryRunProtection}
-                    onChange={(e) => setDryRunProtection(e.target.checked)}
-                    className="h-4 w-4 accent-primary-700 rounded"
-                  />
-                </label>
-
-                <label className="flex items-center justify-between cursor-pointer rounded-2xl bg-slate-50 p-3 border border-slate-100">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">
-                      {isBn ? "ভোল্টেজ কাট-অফ (Voltage Guard)" : "Voltage Guard (180V - 250V)"}
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      {isBn ? "বিদ্যুতের ভোল্টেজ বিপজ্জনক হলে পাম্প বন্ধ রাখা" : "Protects against low line voltage or surges"}
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={voltageCutoff}
-                    onChange={(e) => setVoltageCutoff(e.target.checked)}
-                    className="h-4 w-4 accent-primary-700 rounded"
-                  />
-                </label>
-              </div>
+                  <Radio className="h-4 w-4" />
+                  <span>{isBn ? "ডিভাইস কানেক্ট করুন" : "Connect Device"}</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Device Hardware & Pin Settings */}
-          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-800">
-                <Cpu className="h-5 w-5" />
+          {isConnected && device && (
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3 text-xs">
+              <div className="rounded-xl bg-slate-50 p-3 border border-slate-100">
+                <span className="text-slate-500">{isBn ? "কানেক্টের সময়:" : "Connected At:"}</span>
+                <p className="mt-0.5 font-semibold text-slate-800">
+                  {device.lastConnectedAt ? new Date(device.lastConnectedAt).toLocaleString() : "Just now"}
+                </p>
               </div>
+
+              <div className="rounded-xl bg-slate-50 p-3 border border-slate-100">
+                <span className="text-slate-500">{isBn ? "অ্যাক্টিভেশন টোকেন:" : "Session Token:"}</span>
+                <p className="mt-0.5 font-mono font-semibold text-slate-800 truncate">
+                  {device.token || "active_token_session"}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-50 p-3 border border-slate-100">
+                <span className="text-slate-500">{isBn ? "টেলিমিতি ফ্রিকোয়েন্সি:" : "Heartbeat Interval:"}</span>
+                <p className="mt-0.5 font-semibold text-slate-800">Every 15 Seconds</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 2. Credentials & Gateway Configuration */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Key className="h-5 w-5 text-emerald-600" />
+            <span>{isBn ? "ডিভাইস ক্রেডেনশিয়াল ও গেটওয়ে সেটিংস" : "Credentials & Gateway Configuration"}</span>
+          </h2>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                {isBn ? "ডিভাইস নাম" : "Device Name"}
+              </label>
+              <input
+                type="text"
+                value={deviceName}
+                onChange={(e) => setDeviceName(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                {isBn ? "ডিভাইস আইডি" : "Device ID"}
+              </label>
+              <input
+                type="text"
+                disabled
+                value={device?.deviceId || "esp32-001"}
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 p-2.5 text-sm font-mono text-slate-600"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                {isBn ? "ডিভাইস সিক্রেট কী (PIN)" : "Device Secret Key / PIN"}
+              </label>
+              <input
+                type="text"
+                value={deviceKey}
+                onChange={(e) => setDeviceKey(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500"
+              />
+              <span className="text-[11px] text-emerald-600 mt-1 block">Default production key: 102030</span>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                {isBn ? "ক্লাউড গেটওয়ে ইউআরএল" : "IoT Cloud Gateway URL"}
+              </label>
+              <input
+                type="text"
+                disabled
+                value="https://esp32-iot-cloude-connect.vercel.app"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-100 p-2.5 text-xs font-mono text-slate-600"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end border-t border-slate-100 pt-4">
+            <button
+              onClick={handleSave}
+              className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 transition"
+            >
+              {savedSuccess ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+              <span>{savedSuccess ? (isBn ? "সংরক্ষিত হয়েছে!" : "Saved!") : (isBn ? "সেটিংস সংরক্ষণ করুন" : "Save Changes")}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 3. Motor Safety & Cutoffs */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-emerald-600" />
+            <span>{isBn ? "মোটর ও পাম্প সেফটি ইন্টারলক" : "Motor Safety & Auto-Cutoff Interlocks"}</span>
+          </h2>
+
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 border border-slate-100">
               <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  {isBn ? "হার্ডওয়্যার ও ডিভাইস কনফিগারেশন" : "ESP32 Device Configuration"}
-                </h3>
+                <p className="text-sm font-semibold text-slate-800">
+                  {isBn ? "ড্রাই-রান সুরক্ষা (Dry-Run Protection)" : "Dry-Run Protection"}
+                </p>
                 <p className="text-xs text-slate-500">
-                  {isBn ? "ডিভাইসের নাম, জিপিআইও পিন ও নেটওয়ার্ক সেটিংস" : "Network naming, GPIO mapping, and synchronization"}
+                  {isBn ? "পানির স্তরে প্রবাহ না থাকলে মোটর ৫ মিনিটে স্বয়ংক্রিয়ভাবে বন্ধ হবে" : "Shuts off pump within 5 minutes if no water flow is detected"}
                 </p>
               </div>
+              <input
+                type="checkbox"
+                checked={dryRunProtection}
+                onChange={(e) => setDryRunProtection(e.target.checked)}
+                className="h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
             </div>
 
-            <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 border border-slate-100">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  {isBn ? "ডিভাইসের নাম (Device Name)" : "Device Friendly Name"}
-                </label>
-                <input
-                  type="text"
-                  value={deviceName}
-                  onChange={(e) => setDeviceName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-primary-600"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {isBn ? "রিলে ১ পিন (Relay 1)" : "Relay 1 Pin"}
-                  </label>
-                  <select
-                    value={relay1Pin}
-                    onChange={(e) => setRelay1Pin(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-primary-600"
-                  >
-                    <option>GPIO 26</option>
-                    <option>GPIO 25</option>
-                    <option>GPIO 32</option>
-                    <option>GPIO 33</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    {isBn ? "রিলে ২ পিন (Relay 2)" : "Relay 2 Pin"}
-                  </label>
-                  <select
-                    value={relay2Pin}
-                    onChange={(e) => setRelay2Pin(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-primary-600"
-                  >
-                    <option>GPIO 27</option>
-                    <option>GPIO 14</option>
-                    <option>GPIO 12</option>
-                    <option>GPIO 13</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  {isBn ? "সময় অঞ্চল (Timezone)" : "Timezone & NTP Sync"}
-                </label>
-                <select
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-primary-600"
-                >
-                  <option>Asia/Dhaka (GMT+6)</option>
-                  <option>Asia/Kolkata (GMT+5:30)</option>
-                  <option>UTC (GMT+0)</option>
-                </select>
-              </div>
-
-              <div className="rounded-2xl bg-sky-50/70 p-3 border border-sky-100 flex items-start gap-2.5">
-                <Info className="h-4 w-4 text-sky-700 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-sky-800 leading-relaxed">
-                  {isBn
-                    ? "সব পরিবর্তন সরাসরি ESP32 এর নন-ভোলাটাইল স্টোরেজে (NVS) সংরক্ষিত হয়। বিদ্যুৎ চলে গেলেও সেটিংস নষ্ট হবে না।"
-                    : "Settings are flushed directly to ESP32 Flash (NVS) over MQTT, surviving power loss and system reboots."}
+                <p className="text-sm font-semibold text-slate-800">
+                  {isBn ? "ভোল্টেজ কাটঅফ (Under/Over Voltage Cutoff)" : "Voltage Fluctuation Cutoff"}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {isBn ? "১৮০V এর নিচে অথবা ২৫০V এর উপরে গেলে মোটর ট্রিপ করবে" : "Protects motor coils against brownouts below 180V or surges above 250V"}
                 </p>
               </div>
+              <input
+                type="checkbox"
+                checked={voltageCutoff}
+                onChange={(e) => setVoltageCutoff(e.target.checked)}
+                className="h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+            </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMaxRuntime(45);
-                    setDryRunProtection(true);
-                    setVoltageCutoff(true);
-                  }}
-                  className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  {isBn ? "রিসেট" : "Reset Defaults"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="flex items-center gap-1.5 rounded-xl bg-primary-700 px-5 py-2 text-xs font-semibold text-white shadow transition hover:bg-primary-800"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  {isBn ? "সেটিংস সংরক্ষণ করুন" : "Save All Settings"}
-                </button>
+            <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 border border-slate-100">
+              <div>
+                <p className="text-sm font-semibold text-slate-800">
+                  {isBn ? "সর্বোচ্চ নিরবচ্ছিন্ন চলার সীমা (Max Continuous Runtime)" : "Max Continuous Runtime"}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {isBn ? "একটানা পাম্প চলার পর স্বয়ংক্রিয় বিরতি" : "Automatic cool-off period after extended watering"}
+                </p>
               </div>
+              <span className="font-bold text-slate-800">{maxRuntime} mins</span>
             </div>
           </div>
-
         </div>
 
       </div>
+
+      {/* Connect Modal */}
+      <DeviceConnectModal
+        isOpen={isConnectModalOpen}
+        onClose={() => setIsConnectModalOpen(false)}
+      />
     </div>
   );
 }

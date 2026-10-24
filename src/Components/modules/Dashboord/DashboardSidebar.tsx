@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -21,10 +22,13 @@ import {
   History,
   Mic,
   Settings,
+  Radio,
 } from "lucide-react";
 
 import { useLanguage } from "@/lib/language-context";
 import { useAuth } from "@/lib/auth-context";
+import { useDevice } from "@/context/device-context";
+import DeviceConnectModal from "@/Components/modules/Device/DeviceConnectModal";
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -140,8 +144,10 @@ export default function DashboardSidebar({
   const pathname = usePathname();
   const { t, lang } = useLanguage();
   const { user } = useAuth();
+  const { isConnected } = useDevice();
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
 
-  const activeNavItems = user
+  const activeNavItems = user && isConnected
     ? [...publicNavItems, ...authenticatedNavItems]
     : publicNavItems;
 
@@ -216,30 +222,43 @@ export default function DashboardSidebar({
                 </p>
               </div>
 
-              {authenticatedNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-                      isActive
-                        ? "bg-primary-50 font-medium text-primary-800"
-                        : "font-normal text-slate-600 hover:bg-primary-50/60"
-                    }`}
+              {!isConnected ? (
+                <div className="px-1 py-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsConnectModalOpen(true)}
+                    className="flex w-full items-center gap-2.5 rounded-xl border border-dashed border-emerald-500/60 bg-emerald-50/80 px-3 py-2.5 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100 hover:border-emerald-600 active:scale-[0.98]"
                   >
-                    <Icon
-                      className={`h-4 w-4 shrink-0 ${
-                        isActive ? "text-primary-700" : "text-slate-400"
-                      }`}
-                    />
+                    <Radio className="h-4 w-4 text-emerald-600 animate-pulse shrink-0" />
+                    <span className="truncate">{lang === "BN" ? "ডিভাইস কানেক্ট করুন" : "Connect Device"}</span>
+                  </button>
+                </div>
+              ) : (
+                authenticatedNavItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href;
 
-                    {t(item.key as any, item.label)}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                        isActive
+                          ? "bg-primary-50 font-medium text-primary-800"
+                          : "font-normal text-slate-600 hover:bg-primary-50/60"
+                      }`}
+                    >
+                      <Icon
+                        className={`h-4 w-4 shrink-0 ${
+                          isActive ? "text-primary-700" : "text-slate-400"
+                        }`}
+                      />
+
+                      {t(item.key as any, item.label)}
+                    </Link>
+                  );
+                })
+              )}
             </>
           )}
         </nav>
@@ -293,7 +312,24 @@ export default function DashboardSidebar({
             </Link>
           );
         })}
+
+        {user && !isConnected && (
+          <button
+            type="button"
+            onClick={() => setIsConnectModalOpen(true)}
+            aria-label="Connect Device"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300"
+          >
+            <Radio className="h-[21px] w-[21px] animate-pulse" />
+          </button>
+        )}
       </nav>
+
+      {/* Device Connection Modal */}
+      <DeviceConnectModal
+        isOpen={isConnectModalOpen}
+        onClose={() => setIsConnectModalOpen(false)}
+      />
     </>
   );
 }

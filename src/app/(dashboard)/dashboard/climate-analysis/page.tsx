@@ -36,7 +36,9 @@ import {
   OnsetAnalysisData,
 } from "@/lib/apis/analyzeAi";
 import { useLanguage } from "@/lib/language-context";
+import { useAnalysis } from "@/lib/analysis-context";
 import { MONTH_NAMES } from "@/lib/translations/dictionaries";
+
 
 // Mapbox is browser-only — disable SSR
 const LocationMapSection = dynamic(
@@ -282,14 +284,27 @@ function ClimateAnalysisContent() {
     translateDynamicSync,
   } = useLanguage();
 
-  const [location, setLocation] = useState(params.get("location") || "");
-  const [crop, setCrop] = useState(params.get("crop") || "");
-  const [priority, setPriority] = useState(params.get("priority") || "");
-  const [hasResult, setHasResult] = useState(false);
+  const { activeAnalysis, setActiveAnalysis } = useAnalysis();
+
+  const [location, setLocation] = useState(params.get("location") || activeAnalysis?.location?.district || "");
+  const [crop, setCrop] = useState(params.get("crop") || "Aman Rice");
+  const [priority, setPriority] = useState(params.get("priority") || "Save Water");
+  const [hasResult, setHasResult] = useState(Boolean(activeAnalysis));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [analysisData, setAnalysisData] = useState<OnsetAnalysisData | null>(null);
+  const [analysisData, setAnalysisData] = useState<OnsetAnalysisData | null>(activeAnalysis);
   const [loadStep, setLoadStep] = useState(0);
+
+  // Sync with global activeAnalysis if it changes
+  useEffect(() => {
+    if (activeAnalysis) {
+      setAnalysisData(activeAnalysis);
+      setHasResult(true);
+      if (activeAnalysis.location?.district) {
+        setLocation(activeAnalysis.location.district);
+      }
+    }
+  }, [activeAnalysis]);
 
   // Mobile loading screen: step gulo timer diye ek ek kore tick hoy
   useEffect(() => {
@@ -316,8 +331,8 @@ function ClimateAnalysisContent() {
 
       if (res && res.success && res.data) {
         setAnalysisData(res.data);
+        setActiveAnalysis(res.data);
         setHasResult(true);
-        window.localStorage.setItem("fieldshift:last-analysis-id", res.data.analysisId);
       } else {
         setError(res?.message || "Failed to analyze climate data. Please try again.");
       }
@@ -341,6 +356,7 @@ function ClimateAnalysisContent() {
       executeAnalysis(locParam, cropParam, priParam);
     }
   }, [params]);
+
 
   const handleAnalyze = () => {
     router.push(
@@ -440,10 +456,7 @@ function ClimateAnalysisContent() {
                 <h4 className="font-semibold text-rose-900">{t("error_title")}</h4>
                 <p className="mt-1 text-sm text-rose-700">{error}</p>
                 <p className="mt-2 text-xs text-rose-600">
-                  {t("error_host_hint")}{" "}
-                  <code className="rounded bg-rose-100 px-1 py-0.5 font-mono text-[11px]">
-                    {process.env.NEXT_PUBLIC_API_URL || "http://localhost:5007"}
-                  </code>
+                  {t("error_host_hint")}
                 </p>
               </div>
             </div>

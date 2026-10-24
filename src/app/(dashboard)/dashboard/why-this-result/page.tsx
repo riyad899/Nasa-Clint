@@ -35,7 +35,10 @@ import {
   TransparencyResponse,
 } from "@/lib/apis/analyzeAi";
 
+import { useAnalysis } from "@/lib/analysis-context";
+
 const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
+
 
 const rainfall = { hist: [40, 85, 215, 210, 140, 65], recent: [55, 110, 185, 180, 110, 55] };
 const temperature = { hist: [27, 29, 31, 32, 31, 28], recent: [31, 33, 35, 36, 35, 32] };
@@ -78,8 +81,10 @@ const steps = [
 
 export default function WhyThisResultPage() {
   const searchParams = useSearchParams();
-  const [location, setLocation] = useState("Rajshahi");
-  const [crop, setCrop] = useState("Aman Rice");
+  const { activeAnalysis } = useAnalysis();
+
+  const [location, setLocation] = useState(activeAnalysis?.location?.district || "Rajshahi");
+  const [crop, setCrop] = useState(activeAnalysis?.crop?.cropType === "aman_rice" ? "Aman Rice" : (activeAnalysis?.crop?.cropType || "Aman Rice"));
   const [priority, setPriority] = useState("Save Water");
   const [analysisId, setAnalysisId] = useState("");
   const [transparency, setTransparency] = useState<TransparencyResponse["data"]>(null);
@@ -90,11 +95,12 @@ export default function WhyThisResultPage() {
 
   useEffect(() => {
     const requestedId = searchParams.get("analysisId");
-    const storedId = window.localStorage.getItem("fieldshift:last-analysis-id");
+    const storedId = activeAnalysis?.analysisId || (typeof window !== "undefined" ? window.localStorage.getItem("fieldshift:last-analysis-id") : null);
     const nextAnalysisId = requestedId || storedId || "";
     setAnalysisId(nextAnalysisId);
 
     if (!nextAnalysisId) return;
+
 
     let cancelled = false;
     setTransparencyLoading(true);
@@ -410,7 +416,7 @@ export default function WhyThisResultPage() {
               <div key={source.id} className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="flex items-center gap-2 text-base font-semibold text-slate-900"><Database className="h-5 w-5 text-primary-700" /> {source.provider} {source.source}</h3><p className="mt-1 text-xs text-slate-500">{source.dataset} · {source.sourceVersion} · {source.fetchStatus}</p></div><a href={source.sourceLink} target="_blank" rel="noreferrer" className="text-xs font-semibold text-primary-700 hover:underline">Open source</a></div>
                 <div className="mt-4 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4"><div><p className="text-slate-500">Variable</p><p className="mt-1 font-medium text-slate-800">{source.variables.join(", ")}</p></div><div><p className="text-slate-500">Units</p><p className="mt-1 font-medium text-slate-800">{Object.values(source.units).join(", ")}</p></div><div><p className="text-slate-500">Records</p><p className="mt-1 font-medium text-slate-800">{source.recordCount}</p></div><div><p className="text-slate-500">Requested range</p><p className="mt-1 font-medium text-slate-800">{source.requestedStart} to {source.requestedEnd}</p></div></div>
-                <details className="mt-4 rounded-xl bg-slate-50 p-3 text-xs"><summary className="cursor-pointer font-semibold text-slate-700">View request parameters and endpoint</summary><p className="mt-2 break-all font-mono text-slate-600">{source.endpoint}</p><pre className="mt-2 overflow-x-auto text-slate-600">{JSON.stringify(source.requestParameters, null, 2)}</pre></details>
+                <details className="mt-4 rounded-xl bg-slate-50 p-3 text-xs"><summary className="cursor-pointer font-semibold text-slate-700">View dataset query parameters</summary><pre className="mt-2 overflow-x-auto text-slate-600">{JSON.stringify(source.requestParameters, null, 2)}</pre></details>
               </div>
             ))}
 

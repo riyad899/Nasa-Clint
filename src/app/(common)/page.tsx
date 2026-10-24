@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Leaf,
   ArrowRight,
@@ -13,9 +14,21 @@ import {
 import { useLanguage } from "@/lib/language-context";
 
 export default function HomePage() {
+  const router = useRouter();
   const { lang } = useLanguage();
+  const [query, setQuery] = useState("");
 
   const isBn = lang === "BN";
+
+  const handleAskSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = query.trim();
+    if (trimmed) {
+      router.push(`/dashboard/ask-ai?q=${encodeURIComponent(trimmed)}`);
+    } else {
+      router.push("/dashboard/ask-ai");
+    }
+  };
 
   const stages = [
     {
@@ -90,36 +103,36 @@ export default function HomePage() {
           <div className="mt-5 flex w-full max-w-2xl flex-col items-center justify-center gap-2.5 sm:flex-row">
 
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                window.location.href = "/dashboard/ask-ai";
-              }}
-              className="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm"
+              onSubmit={handleAskSubmit}
+              className="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all"
             >
               <Leaf className="h-4 w-4 flex-shrink-0 text-[#147a55]" />
 
               <input
                 type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder={isBn ? "আজ আপনি কী জানতে চান?" : "What would you like to do today?"}
                 className="w-full bg-transparent text-xs text-slate-700 placeholder-slate-400 outline-none sm:text-sm"
               />
 
               <button
                 type="submit"
-                aria-label="Search"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e5f1eb] text-[#147a55] transition hover:bg-[#d4e9df]"
+                aria-label="Search and ask AI"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e5f1eb] text-[#147a55] transition hover:bg-[#d4e9df] active:scale-95 cursor-pointer"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 
-            <Link
-              href="/dashboard"
-              className="flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#147a55] px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0f6345] sm:text-sm"
+            <button
+              type="button"
+              onClick={() => handleAskSubmit()}
+              className="flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#147a55] px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0f6345] active:scale-95 sm:text-sm cursor-pointer"
             >
               <Sparkles className="h-4 w-4" />
               {isBn ? "শুরু করুন" : "Let's try"}
-            </Link>
+            </button>
 
           </div>
 

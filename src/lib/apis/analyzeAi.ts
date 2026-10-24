@@ -205,3 +205,60 @@ export async function getAnalysisObservations(
     params: { source: "POWER", variable: "PRECTOTCORR", page, pageSize },
   });
 }
+
+export async function getLatestAnalysis(): Promise<{ success: boolean; data: any }> {
+  return httpClient.get<{ success: boolean; data: any }>("/analyses/latest");
+}
+
+export async function getAnalysisHistory(): Promise<{ success: boolean; data: any[] }> {
+  return httpClient.get<{ success: boolean; data: any[] }>("/analyses/history");
+}
+
+export async function saveAnalysisToHistory(data: any): Promise<{ success: boolean; data: any }> {
+  return httpClient.post<{ success: boolean; data: any }>("/analyses/save", data);
+}
+
+export interface ProboyChatPayload {
+  conversationId?: string;
+  message: string;
+  guestSessionId?: string;
+  location?: {
+    latitude?: number;
+    longitude?: number;
+    district?: string;
+  };
+  crop?: string;
+  language?: "BN" | "EN" | "bn" | "en";
+}
+
+export interface ProboyChatResponse {
+  success: boolean;
+  message: string;
+  data: {
+    conversationId: string;
+    message: {
+      role: "assistant" | "user";
+      content: string;
+    };
+    sources: Array<{
+      type: string;
+      title: string;
+      timestamp?: string;
+      details?: any;
+    }>;
+    contextStatus: {
+      userAuthenticated: boolean;
+      deviceDataAvailable: boolean;
+      deviceOnline?: boolean;
+      analysisDataAvailable: boolean;
+      knowledgeBaseCount: number;
+    };
+  };
+}
+
+export async function sendProboyChatMessage(payload: ProboyChatPayload): Promise<ProboyChatResponse> {
+  return httpClient.post<ProboyChatResponse>("/proboy/chat", payload, {
+    timeout: 60000,
+  });
+}
+

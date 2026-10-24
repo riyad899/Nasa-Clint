@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import { useLanguage } from "@/lib/language-context";
+import DeviceConnectGate from "@/Components/modules/Device/DeviceConnectGate";
 
 const script = Caveat({
   subsets: ["latin"],
@@ -39,7 +40,7 @@ interface AutomationRule {
   color: string;
 }
 
-export default function AutomationRulesPage() {
+function AutomationRulesContent() {
   const { lang } = useLanguage();
   const isBn = lang === "BN";
 
@@ -275,5 +276,16 @@ export default function AutomationRulesPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function AutomationRulesPage() {
+  return (
+    <DeviceConnectGate
+      pageTitle="Sensor Automation Rules"
+      pageSubtitle="Connect your ESP32 device to configure threshold-triggered automated watering and relay rules."
+    >
+      <AutomationRulesContent />
+    </DeviceConnectGate>
   );
 }

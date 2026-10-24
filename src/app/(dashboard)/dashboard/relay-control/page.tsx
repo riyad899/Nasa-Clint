@@ -15,28 +15,59 @@ import {
   Flame,
   CheckCircle2,
   Sliders,
+  RefreshCw,
+  Cpu,
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import { useLanguage } from "@/lib/language-context";
+import { useDevice } from "@/context/device-context";
+import DeviceConnectGate from "@/Components/modules/Device/DeviceConnectGate";
 
 const script = Caveat({
   subsets: ["latin"],
   weight: ["500", "600"],
 });
 
-export default function RelayControlPage() {
+function RealRelayControlContent() {
   const { lang } = useLanguage();
   const isBn = lang === "BN";
 
-  // Relay states
-  const [relay1, setRelay1] = useState(true); // Water Pump Motor
-  const [relay2, setRelay2] = useState(false); // Drip Solenoid Valve
-  const [quickTimer, setQuickTimer] = useState<number | null>(30); // minutes
+  const {
+    device,
+    isOnline,
+    relays,
+    toggleRelay,
+    refreshData,
+    isLoadingData,
+  } = useDevice();
+
+  const [togglingRelay1, setTogglingRelay1] = useState(false);
+  const [togglingRelay2, setTogglingRelay2] = useState(false);
   const [safetyLock, setSafetyLock] = useState(false);
 
-  const handleAllOff = () => {
-    setRelay1(false);
-    setRelay2(false);
+  const handleToggle1 = async () => {
+    if (safetyLock) return;
+    setTogglingRelay1(true);
+    await toggleRelay(1, !relays.relay1);
+    setTogglingRelay1(false);
+  };
+
+  const handleToggle2 = async () => {
+    if (safetyLock) return;
+    setTogglingRelay2(true);
+    await toggleRelay(2, !relays.relay2);
+    setTogglingRelay2(false);
+  };
+
+  const handleAllOff = async () => {
+    setTogglingRelay1(true);
+    setTogglingRelay2(true);
+    await Promise.all([
+      toggleRelay(1, false),
+      toggleRelay(2, false),
+    ]);
+    setTogglingRelay1(false);
+    setTogglingRelay2(false);
   };
 
   return (
@@ -113,244 +144,193 @@ export default function RelayControlPage() {
               onClick={() => setSafetyLock(!safetyLock)}
               className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
                 safetyLock
-                  ? "border-amber-300 bg-amber-100 text-amber-800"
+                  ? "border-amber-400 bg-amber-100 text-amber-900"
                   : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
-              {safetyLock ? (isBn ? "🔒 লক সক্রিয়" : "🔒 Safety Locked") : (isBn ? "লক করুন" : "Lock Controls")}
+              <ShieldCheck className="mr-1.5 inline h-4 w-4" />
+              {safetyLock ? (isBn ? "লক সক্রিয়" : "Locked") : (isBn ? "লক অন করুন" : "Lock Switches")}
             </button>
 
             <button
               onClick={handleAllOff}
-              disabled={safetyLock}
-              className="flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-rose-700 active:scale-95 disabled:opacity-50"
+              disabled={togglingRelay1 || togglingRelay2}
+              className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-rose-600/30 transition hover:bg-rose-700 active:scale-95 disabled:opacity-60"
             >
-              <Power className="h-4 w-4" />
-              {isBn ? "সব বন্ধ করুন (ALL OFF)" : "Emergency ALL OFF"}
+              {isBn ? "সব বন্ধ করুন (Kill All)" : "Emergency Stop All"}
             </button>
           </div>
         </div>
 
-        {/* The Two Main Relays Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Real Relays Dual Grid */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 
           {/* RELAY 1: Water Pump Motor */}
           <div
-            className={`relative overflow-hidden rounded-3xl border transition-all duration-300 ${
-              relay1
-                ? "border-emerald-300 bg-gradient-to-br from-emerald-50/90 via-white to-white shadow-lg shadow-emerald-500/10 ring-2 ring-emerald-500/20"
-                : "border-slate-200 bg-white shadow-sm"
+            className={`rounded-3xl border p-6 shadow-sm transition-all sm:p-8 ${
+              relays.relay1
+                ? "border-emerald-500 bg-gradient-to-b from-emerald-50/70 to-white ring-2 ring-emerald-500/20"
+                : "border-slate-200 bg-white"
             }`}
           >
-            <div className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl transition ${
-                      relay1 ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30" : "bg-slate-100 text-slate-400"
-                    }`}
-                  >
-                    <Zap className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 uppercase">
-                        Relay 1 · GPIO 26
-                      </span>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          relay1 ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500"
-                        }`}
-                      >
-                        <span className={`h-1.5 w-1.5 rounded-full ${relay1 ? "animate-ping bg-emerald-600" : "bg-slate-400"}`} />
-                        {relay1 ? (isBn ? "চালু (RUNNING)" : "RUNNING") : (isBn ? "বন্ধ (OFF)" : "OFF")}
-                      </span>
-                    </div>
-                    <h2 className="mt-1 text-xl font-bold text-slate-900">
-                      {isBn ? "প্রধান পানি তোলার পাম্প (Motor 1)" : "Main Irrigation Motor (Pump 1)"}
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      {isBn ? "১.৫ এইচপি মনোব্লক সেচ মোটর · সেক্টর ১ ও ২" : "1.5 HP Monoblock Submersible · East Sector"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Big Toggle Switch */}
-                <button
-                  type="button"
-                  disabled={safetyLock}
-                  onClick={() => setRelay1(!relay1)}
-                  className={`relative inline-flex h-10 w-20 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-                    relay1 ? "bg-emerald-600" : "bg-slate-300"
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl transition ${
+                    relays.relay1 ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30" : "bg-slate-100 text-slate-400"
                   }`}
-                  role="switch"
-                  aria-checked={relay1}
                 >
-                  <span
-                    className={`pointer-events-none inline-block h-9 w-9 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                      relay1 ? "translate-x-10" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Live Telemetry inside card */}
-              <div className="mt-6 grid grid-cols-3 gap-3 rounded-2xl bg-slate-50/80 p-3 text-center border border-slate-100">
+                  <Power className="h-6 w-6" />
+                </span>
                 <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{isBn ? "পাওয়ার" : "Power"}</p>
-                  <p className="mt-0.5 text-base font-bold text-slate-800">{relay1 ? "1,140 W" : "0 W"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{isBn ? "ভোল্টেজ" : "Voltage"}</p>
-                  <p className="mt-0.5 text-base font-bold text-slate-800">{relay1 ? "228 V" : "229 V"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{isBn ? "কারেন্ট" : "Current"}</p>
-                  <p className="mt-0.5 text-base font-bold text-slate-800">{relay1 ? "4.92 A" : "0.00 A"}</p>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {isBn ? "রিলে ১ — ওয়াটার মোটর পাম্প" : "Relay 1 — Irrigation Motor"}
+                    </h2>
+                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-[11px] font-mono font-bold text-emerald-800">
+                      GPIO 26
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    {isBn ? "১.৫ এইচপি সেন্ট্রিফিউগাল পাম্প" : "1.5 HP Centrifugal Surface Pump"}
+                  </p>
                 </div>
               </div>
 
-              {/* Status bar */}
-              <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-slate-400" />
-                  {relay1 ? (isBn ? "চলমান সময়: ২২ মিনিট" : "Runtime: 22m 14s") : (isBn ? "শেষ বন্ধ: ১০ মিনিট আগে" : "Last Stopped: 10m ago")}
-                </span>
-                <span className="flex items-center gap-1 text-emerald-600 font-medium">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  {isBn ? "ড্রাই-রান প্রোটেকশন সক্রিয়" : "Dry-run Protected"}
-                </span>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
+                  relays.relay1 ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-600"
+                }`}
+              >
+                {relays.relay1State}
+              </span>
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-slate-50 p-4 border border-slate-100 text-xs space-y-2">
+              <div className="flex items-center justify-between text-slate-600">
+                <span>{isBn ? "সক্রিয় চ্যানেল:" : "Active Channel:"}</span>
+                <span className="font-semibold text-slate-900">Channel 1 (Main Pump Relay)</span>
               </div>
+              <div className="flex items-center justify-between text-slate-600">
+                <span>{isBn ? "কন্ট্রোল মেথড:" : "Control Method:"}</span>
+                <span className="font-semibold text-emerald-700">{isBn ? "সরাসরি ক্লাউড সিগন্যাল" : "Direct Cloud Relay Control"}</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={handleToggle1}
+                disabled={togglingRelay1 || safetyLock}
+                className={`w-full rounded-2xl py-4 text-sm font-bold shadow-lg transition active:scale-[0.99] disabled:opacity-50 ${
+                  relays.relay1
+                    ? "bg-rose-600 text-white hover:bg-rose-700 shadow-rose-600/20"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/30"
+                }`}
+              >
+                {togglingRelay1 ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    {isBn ? "কমান্ড পাঠানো হচ্ছে..." : "Executing Relay Command..."}
+                  </span>
+                ) : relays.relay1 ? (
+                  isBn ? "মোটর বন্ধ করুন (Turn OFF)" : "Turn Off Water Pump"
+                ) : (
+                  isBn ? "মোটর চালু করুন (Turn ON)" : "Turn On Water Pump"
+                )}
+              </button>
             </div>
           </div>
 
-          {/* RELAY 2: Solenoid Drip Valve */}
+          {/* RELAY 2: Drip Solenoid Valve */}
           <div
-            className={`relative overflow-hidden rounded-3xl border transition-all duration-300 ${
-              relay2
-                ? "border-sky-300 bg-gradient-to-br from-sky-50/90 via-white to-white shadow-lg shadow-sky-500/10 ring-2 ring-sky-500/20"
-                : "border-slate-200 bg-white shadow-sm"
+            className={`rounded-3xl border p-6 shadow-sm transition-all sm:p-8 ${
+              relays.relay2
+                ? "border-sky-500 bg-gradient-to-b from-sky-50/70 to-white ring-2 ring-sky-500/20"
+                : "border-slate-200 bg-white"
             }`}
           >
-            <div className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl transition ${
-                      relay2 ? "bg-sky-600 text-white shadow-md shadow-sky-600/30" : "bg-slate-100 text-slate-400"
-                    }`}
-                  >
-                    <Droplets className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 uppercase">
-                        Relay 2 · GPIO 27
-                      </span>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          relay2 ? "bg-sky-100 text-sky-800" : "bg-slate-100 text-slate-500"
-                        }`}
-                      >
-                        <span className={`h-1.5 w-1.5 rounded-full ${relay2 ? "animate-ping bg-sky-600" : "bg-slate-400"}`} />
-                        {relay2 ? (isBn ? "খোলা (OPEN)" : "OPEN") : (isBn ? "বন্ধ (CLOSED)" : "CLOSED")}
-                      </span>
-                    </div>
-                    <h2 className="mt-1 text-xl font-bold text-slate-900">
-                      {isBn ? "সোলেনয়েড ড্রিপ ভালভ (Valve 2)" : "Drip & Misting Valve (Relay 2)"}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl transition ${
+                    relays.relay2 ? "bg-sky-600 text-white shadow-md shadow-sky-600/30" : "bg-slate-100 text-slate-400"
+                  }`}
+                >
+                  <Droplets className="h-6 w-6" />
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {isBn ? "রিলে ২ — সোলেনয়েড ড্রিপ ভালভ" : "Relay 2 — Solenoid Valve"}
                     </h2>
-                    <p className="text-xs text-slate-500">
-                      {isBn ? "২৪ ভোল্ট ডিসি অটোমেশন ভালভ · গ্রিনহাউস স্প্রিংকলার" : "24V DC Brass Solenoid Valve · Polyhouse"}
-                    </p>
+                    <span className="rounded bg-sky-100 px-2 py-0.5 text-[11px] font-mono font-bold text-sky-800">
+                      GPIO 27
+                    </span>
                   </div>
-                </div>
-
-                {/* Big Toggle Switch */}
-                <button
-                  type="button"
-                  disabled={safetyLock}
-                  onClick={() => setRelay2(!relay2)}
-                  className={`relative inline-flex h-10 w-20 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-                    relay2 ? "bg-sky-600" : "bg-slate-300"
-                  }`}
-                  role="switch"
-                  aria-checked={relay2}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-9 w-9 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                      relay2 ? "translate-x-10" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Live Telemetry inside card */}
-              <div className="mt-6 grid grid-cols-3 gap-3 rounded-2xl bg-slate-50/80 p-3 text-center border border-slate-100">
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{isBn ? "পানি প্রবাহ" : "Flow Rate"}</p>
-                  <p className="mt-0.5 text-base font-bold text-slate-800">{relay2 ? "18.4 L/m" : "0.0 L/m"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{isBn ? "লাইন প্রেসার" : "Line Pressure"}</p>
-                  <p className="mt-0.5 text-base font-bold text-slate-800">{relay2 ? "2.4 Bar" : "0.2 Bar"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{isBn ? "মোট পানি" : "Water Total"}</p>
-                  <p className="mt-0.5 text-base font-bold text-slate-800">{relay2 ? "420 Liters" : "380 Liters"}</p>
+                  <p className="text-xs text-slate-500">
+                    {isBn ? "১২ভি ডিসি বৈদ্যুতিক ভালভ" : "12V DC Normally-Closed Solenoid"}
+                  </p>
                 </div>
               </div>
 
-              {/* Status bar */}
-              <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-slate-400" />
-                  {relay2 ? (isBn ? "চলমান সময়: ৫ মিনিট" : "Open Duration: 5m") : (isBn ? "স্ট্যাটাস: স্ট্যান্ডবাই" : "Status: Standby")}
-                </span>
-                <span className="flex items-center gap-1 text-sky-600 font-medium">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  {isBn ? "নো-লিক ইন্টারগ্রিটি ঠিক আছে" : "No Leak Detected"}
-                </span>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
+                  relays.relay2 ? "bg-sky-600 text-white" : "bg-slate-200 text-slate-600"
+                }`}
+              >
+                {relays.relay2State}
+              </span>
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-slate-50 p-4 border border-slate-100 text-xs space-y-2">
+              <div className="flex items-center justify-between text-slate-600">
+                <span>{isBn ? "সক্রিয় চ্যানেল:" : "Active Channel:"}</span>
+                <span className="font-semibold text-slate-900">Channel 2 (Drip Line Solenoid)</span>
               </div>
+              <div className="flex items-center justify-between text-slate-600">
+                <span>{isBn ? "কন্ট্রোল মেথড:" : "Control Method:"}</span>
+                <span className="font-semibold text-sky-700">{isBn ? "সরাসরি ক্লাউড সিগন্যাল" : "Direct Cloud Relay Control"}</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={handleToggle2}
+                disabled={togglingRelay2 || safetyLock}
+                className={`w-full rounded-2xl py-4 text-sm font-bold shadow-lg transition active:scale-[0.99] disabled:opacity-50 ${
+                  relays.relay2
+                    ? "bg-rose-600 text-white hover:bg-rose-700 shadow-rose-600/20"
+                    : "bg-sky-600 text-white hover:bg-sky-700 shadow-sky-600/30"
+                }`}
+              >
+                {togglingRelay2 ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    {isBn ? "কমান্ড পাঠানো হচ্ছে..." : "Executing Relay Command..."}
+                  </span>
+                ) : relays.relay2 ? (
+                  isBn ? "ভালভ বন্ধ করুন (Close Valve)" : "Close Solenoid Valve"
+                ) : (
+                  isBn ? "ভালভ খুলুন (Open Valve)" : "Open Solenoid Valve"
+                )}
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Quick Timed Irrigation Boost Bar */}
-        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h3 className="text-base font-bold text-slate-900">
-                {isBn ? "দ্রুত সেচ টাইমার (Quick Boost)" : "Quick Irrigation Boost"}
-              </h3>
-              <p className="text-xs text-slate-500">
-                {isBn
-                  ? "নির্দিষ্ট সময়ের জন্য মোটর চালু রাখুন, সময় শেষ হলে স্বয়ংক্রিয়ভাবে বন্ধ হয়ে যাবে।"
-                  : "Run the motor for a specific duration; it will automatically cut off when timer expires."}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {[15, 30, 45, 60].map((mins) => (
-                <button
-                  key={mins}
-                  onClick={() => {
-                    setQuickTimer(mins);
-                    setRelay1(true);
-                  }}
-                  className={`rounded-xl px-4 py-2 text-xs font-semibold transition ${
-                    quickTimer === mins && relay1
-                      ? "bg-primary-700 text-white shadow"
-                      : "border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-                  }`}
-                >
-                  {mins} {isBn ? "মিনিট" : "Mins"}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
       </div>
     </div>
+  );
+}
+
+export default function RelayControlPage() {
+  return (
+    <DeviceConnectGate
+      pageTitle="Relay & Water Motor Control"
+      pageSubtitle="Connect your ESP32 device to toggle high-voltage pump relays and solenoid irrigation valves."
+    >
+      <RealRelayControlContent />
+    </DeviceConnectGate>
   );
 }

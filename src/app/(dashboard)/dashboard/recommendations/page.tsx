@@ -21,6 +21,9 @@ import { TransparentNavSlot } from "../../header-context";
 import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
 
+import { useAnalysis } from "@/lib/analysis-context";
+import { useRouter } from "next/navigation";
+
 const script = Caveat({
   subsets: ["latin"],
   weight: ["500", "600"],
@@ -83,9 +86,15 @@ const heading =
   "flex items-center justify-between text-[15px] font-semibold text-slate-900 sm:text-base";
 
 export default function RecommendationsPage() {
-  const [location, setLocation] = useState("Rajshahi");
-  const [crop, setCrop] = useState("Aman Rice");
+  const router = useRouter();
+  const { activeAnalysis } = useAnalysis();
+
+  const [location, setLocation] = useState(activeAnalysis?.location?.district || "Rajshahi");
+  const [crop, setCrop] = useState(activeAnalysis?.crop?.cropType === "aman_rice" ? "Aman Rice" : (activeAnalysis?.crop?.cropType || "Aman Rice"));
   const [priority, setPriority] = useState("Save Water");
+
+  const windowStart = activeAnalysis?.transplantingWindow?.start || "2026-07-15";
+  const windowEnd = activeAnalysis?.transplantingWindow?.end || "2026-07-25";
 
   return (
     <div className="pb-24 sm:pb-8">
@@ -143,7 +152,9 @@ export default function RecommendationsPage() {
           onLocationChange={setLocation}
           onCropChange={setCrop}
           onPriorityChange={setPriority}
-          onSubmit={() => {}}
+          onSubmit={() => {
+            router.push(`/dashboard/climate-analysis?location=${encodeURIComponent(location)}&crop=${encodeURIComponent(crop)}&priority=${encodeURIComponent(priority)}`);
+          }}
           hasResult
         />
       </div>
@@ -161,9 +172,13 @@ export default function RecommendationsPage() {
             <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-emerald-950/35 to-emerald-950/70" />
 
             <div className="relative z-10 text-white">
-              <p className="text-3xl font-bold leading-tight">15 – 25</p>
-              <p className="text-3xl font-bold leading-tight">JULY</p>
+              <p className="text-2xl font-bold leading-tight">{windowStart} – {windowEnd}</p>
               <p className="mt-1 text-xs text-white/80">Recommended planting window</p>
+              {activeAnalysis && (
+                <span className="mt-2 inline-block rounded-full bg-emerald-500/80 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                  Evidence-Grounded ({activeAnalysis.transplantingWindow?.confidence || "Verified"})
+                </span>
+              )}
             </div>
 
             <div className="absolute bottom-3 right-3 hidden max-w-[170px] rounded-xl bg-white/15 p-3.5 text-white shadow-lg backdrop-blur-sm sm:bottom-5 sm:right-5 sm:block">
@@ -190,24 +205,51 @@ export default function RecommendationsPage() {
             </p>
 
             <p className="mt-3 text-[13px] leading-relaxed text-slate-600 sm:text-sm">
-              Based on recent climate trends, the best time to transplant {crop} in
-              your area is{" "}
-              <span className="font-semibold text-slate-800">15 – 25 July</span>.
+              {activeAnalysis?.explanation ? (
+                activeAnalysis.explanation
+              ) : (
+                <>
+                  Based on recent climate trends, the best time to transplant {crop} in your area is{" "}
+                  <span className="font-semibold text-slate-800">{windowStart} – {windowEnd}</span>.
+                </>
+              )}
             </p>
 
+            {activeAnalysis?.farmerGuidance && activeAnalysis.farmerGuidance.length > 0 && (
+              <div className="mt-4 space-y-1.5 rounded-xl border border-primary-200/60 bg-white/70 p-3 text-xs text-slate-700">
+                <p className="font-semibold text-primary-900">কৃষক নির্দেশনা (Farmer Guidance):</p>
+                {activeAnalysis.farmerGuidance.map((g, i) => (
+                  <p key={i} className="flex items-start gap-1.5">
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                    <span>{g}</span>
+                  </p>
+                ))}
+              </div>
+            )}
+
             <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
-              <button className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-primary-800 px-4 text-sm font-semibold text-white transition active:scale-[0.98] sm:w-auto">
+              <button
+                onClick={() => router.push(`/dashboard/climate-analysis?location=${encodeURIComponent(location)}&crop=${encodeURIComponent(crop)}&priority=${encodeURIComponent(priority)}`)}
+                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-primary-800 px-4 text-sm font-semibold text-white transition active:scale-[0.98] sm:w-auto hover:bg-primary-900"
+              >
                 <Calendar className="h-4 w-4" />
-                View Details
+                View Climate Details
               </button>
 
-              <button className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-primary-200 bg-white px-4 text-sm font-semibold text-primary-800 transition active:scale-[0.98] sm:w-auto">
+              <button
+                onClick={() => {
+                  const targetId = activeAnalysis?.analysisId;
+                  router.push(targetId ? `/dashboard/why-this-result?analysisId=${encodeURIComponent(targetId)}` : "/dashboard/why-this-result");
+                }}
+                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-primary-200 bg-white px-4 text-sm font-semibold text-primary-800 transition active:scale-[0.98] sm:w-auto hover:bg-primary-50"
+              >
                 <Info className="h-4 w-4" />
                 Why this recommendation?
               </button>
             </div>
           </div>
         </section>
+
 
         {/* ================= ROTATION + ALTERNATIVES ================= */}
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-[2fr_1fr]">

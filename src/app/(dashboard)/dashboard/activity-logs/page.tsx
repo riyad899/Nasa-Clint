@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import { useLanguage } from "@/lib/language-context";
+import DeviceConnectGate from "@/Components/modules/Device/DeviceConnectGate";
 
 const script = Caveat({
   subsets: ["latin"],
@@ -35,7 +36,7 @@ interface ActivityLogItem {
   status: "Success" | "Safety Cutoff" | "Warning";
 }
 
-export default function ActivityLogsPage() {
+function ActivityLogsContent() {
   const { lang } = useLanguage();
   const isBn = lang === "BN";
 
@@ -311,5 +312,16 @@ export default function ActivityLogsPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function ActivityLogsPage() {
+  return (
+    <DeviceConnectGate
+      pageTitle="Actuator & Relay Activity Logs"
+      pageSubtitle="Connect your ESP32 device to audit execution logs, emergency trips, and relay switches."
+    >
+      <ActivityLogsContent />
+    </DeviceConnectGate>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
 import { useLanguage } from "@/lib/language-context";
+import DeviceConnectGate from "@/Components/modules/Device/DeviceConnectGate";
 
 const script = Caveat({
   subsets: ["latin"],
@@ -33,7 +34,7 @@ interface ScheduleItem {
   active: boolean;
 }
 
-export default function TimersSchedulesPage() {
+function TimersSchedulesContent() {
   const { lang } = useLanguage();
   const isBn = lang === "BN";
 
@@ -339,5 +340,16 @@ export default function TimersSchedulesPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function TimersSchedulesPage() {
+  return (
+    <DeviceConnectGate
+      pageTitle="Irrigation Timers & Schedules"
+      pageSubtitle="Connect your ESP32 device to set automated motor timers and recurring watering schedules."
+    >
+      <TimersSchedulesContent />
+    </DeviceConnectGate>
   );
 }
