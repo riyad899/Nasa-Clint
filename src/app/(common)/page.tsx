@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import {
@@ -8,44 +10,49 @@ import {
   Users,
   Globe2,
 } from "lucide-react";
-
-const stages = [
-  {
-    label: "Healthier Crops",
-    active: true,
-  },
-  {
-    label: "Stronger Communities",
-    active: false,
-  },
-  {
-    label: "A Resilient Tomorrow",
-    active: false,
-  },
-];
-
-const features = [
-  {
-    icon: Leaf,
-    text: "Data-driven farming advice",
-  },
-  {
-    icon: Droplet,
-    text: "Climate-resilient decisions",
-  },
-  {
-    icon: Users,
-    text: "Support for healthier communities",
-  },
-  {
-    icon: Globe2,
-    text: "Real impact from space to soil",
-  },
-];
+import { useLanguage } from "@/lib/language-context";
 
 export default function HomePage() {
+  const { lang } = useLanguage();
+
+  const isBn = lang === "BN";
+
+  const stages = [
+    {
+      label: isBn ? "সুস্থ ফসল" : "Healthier Crops",
+      active: true,
+    },
+    {
+      label: isBn ? "শক্তিশালী সমাজ" : "Stronger Communities",
+      active: false,
+    },
+    {
+      label: isBn ? "উজ্জ্বল ভবিষ্যৎ" : "A Resilient Tomorrow",
+      active: false,
+    },
+  ];
+
+  const features = [
+    {
+      icon: Leaf,
+      text: isBn ? "উপাত্ত-ভিত্তিক কৃষি পরামর্শ" : "Data-driven farming advice",
+    },
+    {
+      icon: Droplet,
+      text: isBn ? "জলবায়ু-সহনশীল সিদ্ধান্ত" : "Climate-resilient decisions",
+    },
+    {
+      icon: Users,
+      text: isBn ? "উন্নত সমাজের জন্য সহায়তা" : "Support for healthier communities",
+    },
+    {
+      icon: Globe2,
+      text: isBn ? "মহাকাশ থেকে মাটি — বাস্তব প্রভাব" : "Real impact from space to soil",
+    },
+  ];
+
   return (
-    <main className="h-screen overflow-hidden bg-[#fbfaf7]">
+    <div className="h-screen overflow-hidden bg-[#fbfaf7]">
 
       {/* ================================================= */}
       {/*                    HERO CONTENT                   */}
@@ -53,54 +60,57 @@ export default function HomePage() {
 
       <section className="mx-auto h-[58%] max-w-7xl px-5 pt-7 sm:px-8 lg:pt-8">
 
-        {/* ================= MAIN CONTENT (now truly centered) ================= */}
+        {/* ================= MAIN CONTENT ================= */}
 
         <div className="flex h-full flex-col items-center text-center">
 
           {/* NASA Label */}
-
-          <p className="text-[10px] font-medium tracking-[0.2em] text-slate-400 sm:text-xs">
-            POWERED BY NASA EARTH DATA
+          <p className="text-[10px] font-medium tracking-[0.2em] text-slate-400 sm:text-xs uppercase">
+            {isBn ? "নাসা আর্থ ডেটা দ্বারা চালিত" : "POWERED BY NASA EARTH DATA"}
           </p>
 
           {/* Heading */}
-
           <h1 className="mt-2 text-4xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            Better Information
+            {isBn ? "উন্নত তথ্য" : "Better Information"}
             <br />
             <span className="text-[#147a55]">
-              Brighter Harvests
+              {isBn ? "সমৃদ্ধ ফসল" : "Brighter Harvests"}
             </span>
           </h1>
 
           {/* Description */}
-
           <p className="mt-3 max-w-xl text-xs leading-relaxed text-slate-500 sm:text-sm">
-            FieldShift turns satellite data into simple, practical insights
-            so farmers can adapt, plan, and grow with confidence.
+            {isBn
+              ? "ক্রপওয়াইজ এআই স্যাটেলাইটের তথ্যকে সহজ এবং কার্যকর অন্তর্দৃষ্টিতে রূপান্তর করে, যাতে কৃষকরা আত্মবিশ্বাসের সাথে পরিকল্পনা করতে এবং ফলন বাড়াতে পারেন।"
+              : "CropWise AI turns satellite data into simple, practical insights so farmers can adapt, plan, and grow with confidence."}
           </p>
 
           {/* ================= SEARCH & ACTION ================= */}
 
           <div className="mt-5 flex w-full max-w-2xl flex-col items-center justify-center gap-2.5 sm:flex-row">
 
-            <form className="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm">
-
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                window.location.href = "/dashboard/ask-ai";
+              }}
+              className="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm"
+            >
               <Leaf className="h-4 w-4 flex-shrink-0 text-[#147a55]" />
 
               <input
                 type="text"
-                placeholder="What would you like to do today?"
+                placeholder={isBn ? "আজ আপনি কী জানতে চান?" : "What would you like to do today?"}
                 className="w-full bg-transparent text-xs text-slate-700 placeholder-slate-400 outline-none sm:text-sm"
               />
 
               <button
                 type="submit"
+                aria-label="Search"
                 className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e5f1eb] text-[#147a55] transition hover:bg-[#d4e9df]"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
-
             </form>
 
             <Link
@@ -108,7 +118,7 @@ export default function HomePage() {
               className="flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#147a55] px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0f6345] sm:text-sm"
             >
               <Sparkles className="h-4 w-4" />
-              Let&apos;s try
+              {isBn ? "শুরু করুন" : "Let's try"}
             </Link>
 
           </div>
@@ -135,7 +145,7 @@ export default function HomePage() {
           </div>
 
 
-          {/* ================= STAGES (one straight line) ================= */}
+          {/* ================= STAGES ================= */}
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
 
@@ -208,9 +218,9 @@ export default function HomePage() {
         <div className="absolute left-6 top-6 sm:left-10 sm:top-8 lg:left-14">
 
           <p className="font-serif text-sm italic leading-5 text-white drop-shadow-md sm:text-base">
-            From Space Data
+            {isBn ? "মহাকাশের উপাত্ত থেকে" : "From Space Data"}
             <br />
-            to Stronger Farms
+            {isBn ? "আরও সমৃদ্ধ খামার" : "to Stronger Farms"}
           </p>
 
           <div className="mt-1.5 h-px w-20 bg-white/70" />
@@ -227,13 +237,13 @@ export default function HomePage() {
           </span>
 
           <span>
-            Powered by NASA Earth Data
+            {isBn ? "নাসা আর্থ ডেটা দ্বারা পরিচালিত" : "Powered by NASA Earth Data"}
           </span>
 
         </div>
 
       </section>
 
-    </main>
+    </div>
   );
 }

@@ -10,6 +10,15 @@ export const DICTIONARY = {
     nav_ask_ai: "Ask CropWise AI",
     nav_learn: "Learn",
     nav_about: "About",
+    nav_device_status: "Device Status",
+    nav_device_overview: "Device Overview",
+    nav_relay_control: "Relay Control",
+    nav_timers_schedules: "Timers & Schedules",
+    nav_automation_rules: "Automation Rules",
+    nav_sensor_monitoring: "Sensor Monitoring",
+    nav_activity_logs: "Activity Logs",
+    nav_voice_assistant: "Voice Assistant",
+    nav_device_settings: "Device Settings",
     tagline: "Adapting Farms with NASA Data",
 
     // Common & Actions
@@ -21,6 +30,8 @@ export const DICTIONARY = {
     analysis_id: "ID",
     notifications: "Notifications",
     guest: "Guest",
+    signin: "Sign In",
+    profile: "My Profile",
     logout: "Log Out",
 
     // Hero Section
@@ -117,6 +128,15 @@ export const DICTIONARY = {
     nav_ask_ai: "ক্রপওয়াইজ এআইকে জিজ্ঞাসা করুন",
     nav_learn: "শিখুন",
     nav_about: "আমাদের সম্পর্কে",
+    nav_device_status: "ডিভাইস স্ট্যাটাস",
+    nav_device_overview: "ডিভাইস ওভারভিউ",
+    nav_relay_control: "রিলে কন্ট্রোল",
+    nav_timers_schedules: "টাইমার ও শিডিউল",
+    nav_automation_rules: "অটোমেশন রুলস",
+    nav_sensor_monitoring: "সেন্সর মনিটরিং",
+    nav_activity_logs: "অ্যাক্টিভিটি লগ",
+    nav_voice_assistant: "ভয়েস অ্যাসিস্ট্যান্ট",
+    nav_device_settings: "ডিভাইস ও মোটর সেটিংস",
     tagline: "নাসার তথ্যে আধুনিক কৃষি",
 
     // Common & Actions
@@ -128,6 +148,8 @@ export const DICTIONARY = {
     analysis_id: "আইডি",
     notifications: "বিজ্ঞপ্তি",
     guest: "অতিথি",
+    signin: "লগইন",
+    profile: "আমার প্রোফাইল",
     logout: "লগআউট",
 
     // Hero Section

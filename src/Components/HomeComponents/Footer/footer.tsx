@@ -12,7 +12,7 @@ export default function Footer() {
           </span>
           <span className="font-semibold text-slate-800">CropWise AI</span>
         </div>
-        <p>© {new Date().getFullYear()} CropWise AI. Same Land. New Insights. Stronger Futures.</p>
+        <p suppressHydrationWarning>© {new Date().getFullYear()} CropWise AI. Same Land. New Insights. Stronger Futures.</p>
         <div className="flex gap-5">
           <Link href="/" className="hover:text-slate-800">Privacy</Link>
           <Link href="/" className="hover:text-slate-800">Terms</Link>

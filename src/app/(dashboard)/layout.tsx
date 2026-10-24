@@ -34,10 +34,8 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 export default function RootDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <LanguageProvider>
-      <DashboardHeaderProvider>
-        <Shell>{children}</Shell>
-      </DashboardHeaderProvider>
-    </LanguageProvider>
+    <DashboardHeaderProvider>
+      <Shell>{children}</Shell>
+    </DashboardHeaderProvider>
   );
 }

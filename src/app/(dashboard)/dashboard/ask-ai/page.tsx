@@ -7,7 +7,6 @@ import {
   Send,
   Paperclip,
   ChevronDown,
-  ChevronRight,
   RefreshCw,
   Pencil,
   MapPin,
@@ -21,7 +20,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { TransparentNavSlot } from "../../header-context";
-import FilterBar from "@/Components/modules/Dashboord/FilterBar";
 
 const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
 
@@ -158,46 +156,12 @@ export default function AskAiPage() {
         </div>
       </section>
 
-      {/* ================= CONTEXT ================= */}
-      <div className="relative z-10 -mt-8 mb-5 px-4 sm:-mt-12 sm:mb-8 sm:px-6">
-        {/* Mobile: compact context card */}
-        <div className="flex items-center gap-3 rounded-2xl border border-primary-100 bg-primary-50 p-3 shadow-sm sm:hidden">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-100 text-primary-700">
-            <MapPin className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] text-slate-500">Current Farm Context</p>
-            <p className="truncate text-sm font-semibold text-slate-900">
-              {location} · {crop} · {priority}
-            </p>
-          </div>
-          <button className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary-700">
-            <Pencil className="h-3.5 w-3.5" /> Edit <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        {/* Desktop: FilterBar */}
-        <div className="hidden sm:block">
-          <FilterBar
-            variant="card"
-            location={location}
-            crop={crop}
-            priority={priority}
-            onLocationChange={() => {}}
-            onCropChange={() => {}}
-            onPriorityChange={() => {}}
-            onSubmit={() => {}}
-            hasResult
-          />
-        </div>
-      </div>
-
       {/* ================= CONTENT ================= */}
-      <div className="space-y-6 px-4 sm:px-6">
+      <div className="relative z-10 -mt-6 mb-5 space-y-6 px-4 sm:-mt-10 sm:mb-8 sm:px-6">
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
           {/* Chat panel */}
-          <div className="flex flex-col sm:rounded-2xl sm:border sm:border-slate-100 sm:bg-white">
-            <div className="flex-1 space-y-4 sm:max-h-[480px] sm:overflow-y-auto sm:p-5">
+          <div className="flex h-full flex-col justify-between overflow-hidden sm:rounded-2xl sm:border sm:border-slate-100 sm:bg-white">
+            <div className="flex-1 space-y-4 overflow-y-auto sm:p-4">
               {messages.map((m, i) => (
                 <div key={i} className={`flex gap-3 ${m.from === "user" ? "flex-row-reverse" : ""}`}>
                   <span
@@ -236,33 +200,39 @@ export default function AskAiPage() {
               ))}
             </div>
 
-            {/* Input bar: mobile e bottom nav er upore sticky */}
-            <div className="sticky bottom-16 z-20 mt-4 rounded-2xl border border-slate-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] sm:static sm:mt-0 sm:rounded-none sm:border-0 sm:border-t sm:shadow-none">
-              <div className="flex items-center gap-2 p-3">
-                <button className="rounded-full bg-slate-50 p-2.5 text-slate-500 hover:bg-slate-100 sm:bg-transparent sm:p-2" aria-label="Attach file">
-                  <Paperclip className="h-5 w-5" />
+            {/* Input bar */}
+            <div className="sticky bottom-16 z-20 mt-auto border-t border-slate-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] sm:static sm:mt-auto sm:border-t sm:border-slate-100 sm:px-4 sm:py-2.5 sm:shadow-none">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 py-1 transition-all focus-within:border-primary-600 focus-within:bg-white focus-within:ring-1 focus-within:ring-primary-600/20">
+                <button
+                  type="button"
+                  className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-200/60 hover:text-slate-600"
+                  aria-label="Attach file"
+                >
+                  <Paperclip className="h-4 w-4" />
                 </button>
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && send(input)}
                   placeholder="Ask anything about your farm..."
-                  className="min-w-0 flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+                  className="min-w-0 flex-1 bg-transparent py-1 text-xs text-slate-700 placeholder-slate-400 outline-none sm:text-sm"
                 />
                 <button
+                  type="button"
                   onClick={() => setLang(lang === "BN" ? "EN" : "BN")}
-                  className="flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600"
+                  className="flex shrink-0 items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 shadow-2xs transition hover:bg-slate-50"
                 >
-                  {lang} <ChevronDown className="h-3 w-3" />
+                  {lang} <ChevronDown className="h-3 w-3 text-slate-400" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => send(input)}
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-800 text-white sm:h-9 sm:w-9"
+                  className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary-800 text-white transition hover:bg-primary-900"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <p className="pb-2.5 text-center text-[11px] text-slate-400 sm:pb-3 sm:text-slate-300">
+              <p className="pb-0.5 pt-1.5 text-center text-[10px] text-slate-400">
                 CropWise AI may make mistakes. Please verify important decisions.
               </p>
             </div>
