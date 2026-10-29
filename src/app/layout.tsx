@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { LanguageProvider } from "@/lib/language-context";
+import { AnalysisProvider } from "@/lib/analysis-context";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | FieldShift",
-    default: "FieldShift — Farms Today. A Safer Tomorrow.",
+    template: "%s | CropWise AI",
+    default: "CropWise AI — Farms Today. A Safer Tomorrow.",
   },
   description:
-    "FieldShift turns NASA Earth observation data into simple, practical climate insights so farmers can adapt, plan, and grow with confidence.",
+    "CropWise AI turns NASA Earth observation data into simple, practical climate insights so farmers can adapt, plan, and grow with confidence.",
   keywords: [
     "climate smart farming",
     "NASA earth data",
@@ -24,10 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full scroll-smooth" data-scroll-behavior="smooth">
-      <body className="min-h-full bg-white text-slate-900 antialiased">
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="en" className="h-full scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <body className="min-h-full bg-white text-slate-900 antialiased" suppressHydrationWarning>
+        <AuthProvider>
+          <LanguageProvider>
+            <AnalysisProvider>{children}</AnalysisProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+

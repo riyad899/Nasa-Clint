@@ -1,8 +1,13 @@
 "use client";
 
 import React from "react";
-import { Leaf, Satellite, LineChart, Brain, BarChart3, Cloud, Droplet, ArrowUpRight, Sprout, CloudSun, TrendingUp, Users } from "lucide-react";
+import { Caveat } from "next/font/google";
+import { Leaf, Satellite, LineChart, Brain, BarChart3, Sun, CloudRain, Droplet, ArrowUpRight, Sprout, CloudSun, TrendingUp, Users, Quote, ArrowRight } from "lucide-react";
+import { TransparentNavSlot } from "../../header-context";
 import AskAiBar from "@/Components/modules/Dashboord/AskAiBar";
+
+// Handwritten font — same one used across the app for consistency
+const script = Caveat({ subsets: ["latin"], weight: ["500", "600"] });
 
 const steps = [
   { title: "1. NASA Data", desc: "We collect satellite data on rainfall, temperature, soil moisture, and vegetation.", icon: Satellite },
@@ -12,10 +17,10 @@ const steps = [
 ];
 
 const sources = [
-  { name: "NASA POWER", desc: "Weather and climate data (temperature, rainfall, etc.)", icon: Cloud, tone: "bg-amber-100 text-amber-600" },
-  { name: "GPM IMERG", desc: "Global precipitation data", icon: Droplet, tone: "bg-sky-100 text-sky-600" },
-  { name: "SMAP", desc: "Soil moisture data", icon: Droplet, tone: "bg-indigo-100 text-indigo-600" },
-  { name: "MODIS / VIIRS", desc: "Vegetation index (NDVI)", icon: Leaf, tone: "bg-primary-100 text-primary-700" },
+  { name: "NASA POWER", desc: "Weather and climate data (temperature, rainfall, etc.)", icon: Sun, tone: "bg-amber-100 text-amber-500" },
+  { name: "GPM IMERG", desc: "Global precipitation data", icon: CloudRain, tone: "bg-sky-100 text-sky-600" },
+  { name: "SMAP", desc: "Soil moisture data", icon: Droplet, tone: "bg-blue-100 text-blue-600" },
+  { name: "MODIS / VIIRS", desc: "Vegetation index (NDVI)", icon: Sprout, tone: "bg-primary-100 text-primary-700" },
 ];
 
 const impact = [
@@ -26,19 +31,56 @@ const impact = [
 
 export default function AboutPage() {
   return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#fdf3e0] via-[#f3e0bd] to-[#2f4f38] px-6 py-8 sm:px-10">
-        <h1 className="text-3xl font-semibold text-slate-900">About FieldShift</h1>
-        <p className="mt-1 text-lg font-medium text-slate-800">Adapting Farms with NASA Data</p>
-        <p className="mt-2 max-w-md text-sm text-slate-700">
-          FieldShift uses NASA Earth observations and AI analysis to help farmers make informed, climate-resilient decisions.
-        </p>
-        <p className="mt-4 hidden -rotate-2 font-serif text-sm italic text-[#f4ead2] sm:block">
-          Healthy Fields
-          <br />
-          Brighter Tomorrows.
-        </p>
+    <div className="pb-8">
+      <TransparentNavSlot />
+
+      {/* ================= HERO ================= */}
+      <section className="relative overflow-hidden bg-[#fbfcfa]" style={{ minHeight: 320 }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-[center_60%]"
+            style={{
+              backgroundImage:
+                "url('https://i.ibb.co.com/VYKH4926/Chat-GPT-Image-Sep-25-2026-01-08-52-PM.png')",
+            }}
+          />
+          {/* Minimal left fade so heading text is legible */}
+          <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#fbfcfa]/100 to-transparent" />
+          {/* Top fade for readable navbar */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/20 to-transparent" />
+          {/* Smoky bottom blend into #f5f7f5 */}
+          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-[#f5f7f5]/90 to-transparent" />
+          <div className="absolute bottom-0 right-0 h-[30%] w-[20%] bg-gradient-to-tl from-[#f5f7f5]/90 to-transparent" />
+        </div>
+
+        {/* Text content */}
+        <div className="relative px-6 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-24">
+          <div className="max-w-md">
+            <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">About CropWise AI</h1>
+
+            <p className="mt-1 text-lg font-medium text-slate-800">
+              Adapting Farms with NASA Data
+            </p>
+
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              CropWise AI uses NASA Earth observations and AI analysis to help farmers
+              make informed, climate-resilient decisions.
+            </p>
+          </div>
+
+          <p
+            className={`${script.className} absolute right-6 top-20 hidden -rotate-2 text-2xl leading-6 text-white drop-shadow sm:right-10 sm:block sm:top-24`}
+          >
+            Healthy Fields
+            <br />
+            Brighter Tomorrows.
+          </p>
+        </div>
       </section>
+
+      {/* Content wrapper */}
+      <div className="relative -mt-6 z-10 space-y-6 px-4 sm:px-6">
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <div className="rounded-2xl border border-primary-100 bg-primary-50 p-5">
@@ -54,15 +96,19 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-        <div className="relative flex items-center overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-200 to-emerald-900 p-5">
-          <p className="text-sm italic leading-relaxed text-white/90">
-            &ldquo; data. Stronger farmers. A more resilient tomorrow.&rdquo;
+
+        {/* Quote card — light tinted card with a quote mark + handwritten
+            font, matching the reference (not a dark gradient panel) */}
+        <div className="flex flex-col justify-center rounded-2xl border border-primary-100 bg-primary-50 p-5">
+          <Quote className="h-5 w-5 -rotate-1 text-primary-400" />
+          <p className={`${script.className} -mt-1 -rotate-1 text-xl leading-snug text-primary-800`}>
+            Better data. Stronger farmers. A more resilient tomorrow.
           </p>
         </div>
       </section>
 
       <section className="rounded-2xl border border-slate-100 bg-white p-5">
-        <h2 className="text-base font-semibold text-slate-900">How FieldShift Works</h2>
+        <h2 className="text-base font-semibold text-slate-900">How CropWise AI Works</h2>
         <div className="mt-5 flex items-start justify-between gap-2 overflow-x-auto">
           {steps.map((s, i) => (
             <React.Fragment key={s.title}>
@@ -73,7 +119,9 @@ export default function AboutPage() {
                 <p className="mt-2 text-xs font-semibold text-slate-800">{s.title}</p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-400">{s.desc}</p>
               </div>
-              {i < steps.length - 1 && <div className="mt-7 h-px w-6 flex-shrink-0 bg-slate-200" />}
+              {i < steps.length - 1 && (
+                <ArrowRight className="mt-7 h-4 w-4 flex-shrink-0 text-slate-300" />
+              )}
             </React.Fragment>
           ))}
         </div>
@@ -122,7 +170,7 @@ export default function AboutPage() {
 
       <section className="flex flex-col items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600">
             <Users className="h-5 w-5" />
           </span>
           <div>
@@ -133,11 +181,12 @@ export default function AboutPage() {
           </div>
         </div>
         <button className="flex flex-shrink-0 items-center gap-1.5 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-          Meet the Team <ArrowUpRight className="h-3.5 w-3.5" />
+          Meet the Team <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </section>
 
-      <AskAiBar title="Ask FieldShift AI" subtitle="Ask anything about our project, data sources, or how it works." placeholder="e.g. How does FieldShift use NASA data?" />
+      <AskAiBar title="Ask CropWise AI" subtitle="Ask anything about our project, data sources, or how it works." placeholder="e.g. How does CropWise AI use NASA data?" />
+      </div>
     </div>
   );
 }

@@ -1,52 +1,71 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Leaf,
   ArrowRight,
   Sparkles,
-  BarChart3,
   Droplet,
   Users,
   Globe2,
 } from "lucide-react";
-
-const stages = [
-  {
-    label: "Healthier Crops",
-    active: true,
-  },
-  {
-    label: "Stronger Communities",
-    active: false,
-  },
-  {
-    label: "A Resilient Tomorrow",
-    active: false,
-  },
-];
-
-const features = [
-  {
-    icon: Leaf,
-    text: "Data-driven farming advice",
-  },
-  {
-    icon: Droplet,
-    text: "Climate-resilient decisions",
-  },
-  {
-    icon: Users,
-    text: "Support for healthier communities",
-  },
-  {
-    icon: Globe2,
-    text: "Real impact from space to soil",
-  },
-];
+import { useLanguage } from "@/lib/language-context";
 
 export default function HomePage() {
+  const router = useRouter();
+  const { lang } = useLanguage();
+  const [query, setQuery] = useState("");
+
+  const isBn = lang === "BN";
+
+  const handleAskSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = query.trim();
+    if (trimmed) {
+      router.push(`/dashboard/ask-ai?q=${encodeURIComponent(trimmed)}`);
+    } else {
+      router.push("/dashboard/ask-ai");
+    }
+  };
+
+  const stages = [
+    {
+      label: isBn ? "সুস্থ ফসল" : "Healthier Crops",
+      active: true,
+    },
+    {
+      label: isBn ? "শক্তিশালী সমাজ" : "Stronger Communities",
+      active: false,
+    },
+    {
+      label: isBn ? "উজ্জ্বল ভবিষ্যৎ" : "A Resilient Tomorrow",
+      active: false,
+    },
+  ];
+
+  const features = [
+    {
+      icon: Leaf,
+      text: isBn ? "উপাত্ত-ভিত্তিক কৃষি পরামর্শ" : "Data-driven farming advice",
+    },
+    {
+      icon: Droplet,
+      text: isBn ? "জলবায়ু-সহনশীল সিদ্ধান্ত" : "Climate-resilient decisions",
+    },
+    {
+      icon: Users,
+      text: isBn ? "উন্নত সমাজের জন্য সহায়তা" : "Support for healthier communities",
+    },
+    {
+      icon: Globe2,
+      text: isBn ? "মহাকাশ থেকে মাটি — বাস্তব প্রভাব" : "Real impact from space to soil",
+    },
+  ];
+
   return (
-    <main className="h-screen overflow-hidden bg-[#fbfaf7]">
+    <div className="h-screen overflow-hidden bg-[#fbfaf7]">
 
       {/* ================================================= */}
       {/*                    HERO CONTENT                   */}
@@ -54,153 +73,126 @@ export default function HomePage() {
 
       <section className="mx-auto h-[58%] max-w-7xl px-5 pt-7 sm:px-8 lg:pt-8">
 
-        <div className="grid h-full grid-cols-1 lg:grid-cols-[1fr_240px] lg:gap-8">
+        {/* ================= MAIN CONTENT ================= */}
 
-          {/* ================= MAIN CONTENT ================= */}
+        <div className="flex h-full flex-col items-center text-center">
 
-          <div className="flex flex-col items-center text-center">
+          {/* NASA Label */}
+          <p className="text-[10px] font-medium tracking-[0.2em] text-slate-400 sm:text-xs uppercase">
+            {isBn ? "নাসা আর্থ ডেটা দ্বারা চালিত" : "POWERED BY NASA EARTH DATA"}
+          </p>
 
-            {/* NASA Label */}
+          {/* Heading */}
+          <h1 className="mt-2 text-4xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            {isBn ? "উন্নত তথ্য" : "Better Information"}
+            <br />
+            <span className="text-[#147a55]">
+              {isBn ? "সমৃদ্ধ ফসল" : "Brighter Harvests"}
+            </span>
+          </h1>
 
-            <p className="text-[10px] font-medium tracking-[0.2em] text-slate-400 sm:text-xs">
-              POWERED BY NASA EARTH DATA
-            </p>
+          {/* Description */}
+          <p className="mt-3 max-w-xl text-xs leading-relaxed text-slate-500 sm:text-sm">
+            {isBn
+              ? "ক্রপওয়াইজ এআই স্যাটেলাইটের তথ্যকে সহজ এবং কার্যকর অন্তর্দৃষ্টিতে রূপান্তর করে, যাতে কৃষকরা আত্মবিশ্বাসের সাথে পরিকল্পনা করতে এবং ফলন বাড়াতে পারেন।"
+              : "CropWise AI turns satellite data into simple, practical insights so farmers can adapt, plan, and grow with confidence."}
+          </p>
 
-            {/* Heading */}
+          {/* ================= SEARCH & ACTION ================= */}
 
-            <h1 className="mt-2 text-4xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-              Better Information
-              <br />
-              <span className="text-[#147a55]">
-                Brighter Harvests
-              </span>
-            </h1>
+          <div className="mt-5 flex w-full max-w-2xl flex-col items-center justify-center gap-2.5 sm:flex-row">
 
-            {/* Description */}
-
-            <p className="mt-3 max-w-xl text-xs leading-relaxed text-slate-500 sm:text-sm">
-              FieldShift turns satellite data into simple, practical insights
-              so farmers can adapt, plan, and grow with confidence.
-            </p>
-
-            {/* ================= SEARCH ================= */}
-
-            <form className="mt-5 flex w-full max-w-xl items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm">
-
+            <form
+              onSubmit={handleAskSubmit}
+              className="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pl-4 shadow-sm focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all"
+            >
               <Leaf className="h-4 w-4 flex-shrink-0 text-[#147a55]" />
 
               <input
                 type="text"
-                placeholder="What would you like to do today?"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={isBn ? "আজ আপনি কী জানতে চান?" : "What would you like to do today?"}
                 className="w-full bg-transparent text-xs text-slate-700 placeholder-slate-400 outline-none sm:text-sm"
               />
 
               <button
                 type="submit"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e5f1eb] text-[#147a55] transition hover:bg-[#d4e9df]"
+                aria-label="Search and ask AI"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e5f1eb] text-[#147a55] transition hover:bg-[#d4e9df] active:scale-95 cursor-pointer"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
-
             </form>
 
-            {/* ================= BUTTONS ================= */}
-
-            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row">
-
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 rounded-full bg-[#147a55] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0f6345] sm:text-sm"
-              >
-                <Sparkles className="h-4 w-4" />
-                Start Phase 1 Analysis
-              </Link>
-
-              <Link
-                href="/dashboard/climate-analysis"
-                className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 sm:text-sm"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Start Phase 2 Analysis
-              </Link>
-
-            </div>
-
-            {/* Button Description */}
-
-            <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-slate-400 sm:flex-row sm:gap-8">
-              <span>Quick insights for today</span>
-              <span>Advanced insights for long-term planning</span>
-            </div>
-
-
-            {/* ================= FEATURES ================= */}
-
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-100 pt-4 text-[11px] text-slate-600 sm:gap-x-8 sm:text-xs">
-
-              {features.map((feature) => {
-                const Icon = feature.icon;
-
-                return (
-                  <div
-                    key={feature.text}
-                    className="flex items-center gap-1.5"
-                  >
-                    <Icon className="h-3.5 w-3.5 text-[#147a55]" />
-                    <span>{feature.text}</span>
-                  </div>
-                );
-              })}
-
-            </div>
+            <button
+              type="button"
+              onClick={() => handleAskSubmit()}
+              className="flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#147a55] px-5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0f6345] active:scale-95 sm:text-sm cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isBn ? "শুরু করুন" : "Let's try"}
+            </button>
 
           </div>
 
 
-          {/* ================================================= */}
-          {/*              RIGHT STAGES                         */}
-          {/* ================================================= */}
+          {/* ================= FEATURES ================= */}
 
-          <div className="hidden items-center lg:flex">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-100 pt-4 text-[11px] text-slate-600 sm:gap-x-8 sm:text-xs">
 
-            <div className="relative w-full pl-4">
+            {features.map((feature) => {
+              const Icon = feature.icon;
 
-              {/* Vertical Line */}
+              return (
+                <div
+                  key={feature.text}
+                  className="flex items-center gap-1.5"
+                >
+                  <Icon className="h-3.5 w-3.5 text-[#147a55]" />
+                  <span>{feature.text}</span>
+                </div>
+              );
+            })}
 
-              <div className="absolute left-[19px] top-2 h-[calc(100%-16px)] w-px bg-slate-200" />
+          </div>
 
-              <div className="space-y-6">
 
-                {stages.map((stage) => (
-                  <div
-                    key={stage.label}
-                    className="relative flex items-center gap-4"
+          {/* ================= STAGES ================= */}
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+
+            {stages.map((stage, index) => (
+              <React.Fragment key={stage.label}>
+
+                <div className="flex items-center gap-2">
+
+                  <span
+                    className={`h-3 w-3 flex-shrink-0 rounded-full border-2 ${
+                      stage.active
+                        ? "border-[#147a55] bg-[#147a55]"
+                        : "border-slate-300 bg-[#fbfaf7]"
+                    }`}
+                  />
+
+                  <span
+                    className={`text-xs ${
+                      stage.active
+                        ? "font-semibold text-[#173d2a]"
+                        : "text-slate-400"
+                    }`}
                   >
+                    {stage.label}
+                  </span>
 
-                    <span
-                      className={`relative z-10 h-3 w-3 flex-shrink-0 rounded-full border-2 ${
-                        stage.active
-                          ? "border-[#147a55] bg-[#147a55]"
-                          : "border-slate-300 bg-[#fbfaf7]"
-                      }`}
-                    />
+                </div>
 
-                    <span
-                      className={`text-xs ${
-                        stage.active
-                          ? "font-semibold text-[#173d2a]"
-                          : "text-slate-400"
-                      }`}
-                    >
-                      {stage.label}
-                    </span>
+                {index < stages.length - 1 && (
+                  <span className="hidden h-px w-8 bg-slate-200 sm:block" />
+                )}
 
-                  </div>
-                ))}
-
-              </div>
-
-            </div>
+              </React.Fragment>
+            ))}
 
           </div>
 
@@ -239,9 +231,9 @@ export default function HomePage() {
         <div className="absolute left-6 top-6 sm:left-10 sm:top-8 lg:left-14">
 
           <p className="font-serif text-sm italic leading-5 text-white drop-shadow-md sm:text-base">
-            From Space Data
+            {isBn ? "মহাকাশের উপাত্ত থেকে" : "From Space Data"}
             <br />
-            to Stronger Farms
+            {isBn ? "আরও সমৃদ্ধ খামার" : "to Stronger Farms"}
           </p>
 
           <div className="mt-1.5 h-px w-20 bg-white/70" />
@@ -258,13 +250,13 @@ export default function HomePage() {
           </span>
 
           <span>
-            Powered by NASA Earth Data
+            {isBn ? "নাসা আর্থ ডেটা দ্বারা পরিচালিত" : "Powered by NASA Earth Data"}
           </span>
 
         </div>
 
       </section>
 
-    </main>
+    </div>
   );
 }

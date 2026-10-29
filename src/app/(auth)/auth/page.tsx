@@ -9,7 +9,7 @@ export default function AuthHubPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-800 text-white">
           <Leaf className="h-6 w-6" />
         </div>
-        <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">FieldShift Account Access</h2>
+        <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">CropWise AI Account Access</h2>
         <p className="mt-1.5 text-xs text-slate-500">
           Choose how you&apos;d like to continue
         </p>
